@@ -9,6 +9,7 @@ import { Posttyp } from '../posts/domains/posttyp.entity';
 import { LikeStatusForPostTyp } from '../like-status-for-post/domain/typ-like-status-for-post.entity';
 import { Commenttyp } from '../comments/domaims/commenttyp.entity';
 import { LikeStatusForCommentTyp } from '../like-status-for-comment/domain/typ-like-status-for-comment.entity';
+import { Question } from '../u-questions/domains/question.entity';
 
 @Controller('testing')
 export class TestController {
@@ -27,6 +28,8 @@ export class TestController {
     private readonly commenttypRepository: Repository<Commenttyp>,
     @InjectRepository(LikeStatusForCommentTyp)
     private readonly likeForCommentTypRepository: Repository<LikeStatusForCommentTyp>,
+    @InjectRepository(Question)
+    private readonly questionRepository: Repository<Question>,
   ) {}
 
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -39,6 +42,7 @@ export class TestController {
     await this.usertypRepository.delete({});
     await this.posttypRepository.delete({});
     await this.blogtypRepository.delete({});
+    await this.questionRepository.delete({});
   }
 
   return;

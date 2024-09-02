@@ -50,6 +50,10 @@ import { CommentQuerySqlTypeormRepository } from './feature/comments/reposetorie
 import { LikeStatusForCommentTyp } from './feature/like-status-for-comment/domain/typ-like-status-for-comment.entity';
 import { TypLikeStatusForCommentSqlRepository } from './feature/like-status-for-comment/repositories/typ-like-status-for-comment-sql-repository';
 import { BlogService } from './feature/blogs/services/blog-service';
+import { Question } from './feature/u-questions/domains/question.entity';
+import { QuestionController } from './feature/u-questions/api/question-controller';
+import { QuestionService } from './feature/u-questions/services/question-service';
+import { QuestionRepository } from './feature/users/repositories/question-repository';
 
 dotenv.config();
 
@@ -80,6 +84,7 @@ dotenv.config();
       LikeStatusForPostTyp,
       Commenttyp,
       LikeStatusForCommentTyp,
+      Question,
     ]),
 
     MongooseModule.forRootAsync({
@@ -120,6 +125,7 @@ dotenv.config();
     AuthController,
     SecurityDeviceController,
     SaBlogController,
+    QuestionController,
   ],
   /* все сервисы приложения должны тут добавлены */
   providers: [
@@ -149,6 +155,8 @@ dotenv.config();
     CommentQuerySqlTypeormRepository,
     TypLikeStatusForCommentSqlRepository,
     BlogService,
+    QuestionService,
+    QuestionRepository,
   ],
 })
 export class AppModule {}
