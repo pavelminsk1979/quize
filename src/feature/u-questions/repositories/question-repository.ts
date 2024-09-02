@@ -97,6 +97,29 @@ export class QuestionRepository {
     return true;
   }
 
+  async updateStatusPublishForQuestion(
+    questionId: string,
+    newPublished: boolean,
+  ) {
+    const result = await this.questionRepository
+      .createQueryBuilder()
+      .update(Question)
+      .set({
+        published: newPublished,
+      })
+      .where('id=:questionId', { questionId })
+      .execute();
+
+    /* result это вот такая структура 
+ UpdateResult { generatedMaps: [], raw: [], affected: 0 }
+  affected-- это количество измененных саписей 
+*/
+
+    if (result.affected === 0) return false;
+
+    return true;
+  }
+
   /*  async isExistLogin(login: string) {
       const result = await this.usertypRepository.findOne({
         where: { login: login },

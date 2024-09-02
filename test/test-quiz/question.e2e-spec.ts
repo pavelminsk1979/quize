@@ -9,6 +9,14 @@ describe('tests for andpoint users', () => {
 
   let questionId;
 
+  let questionId2;
+  let questionId3;
+  let questionId4;
+  let questionId5;
+  let questionId6;
+  let questionId7;
+  let questionId8;
+
   const loginPasswordBasic64 = 'YWRtaW46cXdlcnR5';
 
   beforeAll(async () => {
@@ -67,7 +75,7 @@ describe('tests for andpoint users', () => {
   });
 
   it('create question2', async () => {
-    await request(app.getHttpServer())
+    const res = await request(app.getHttpServer())
       .post('/sa/quiz/questions')
       .set('Authorization', `Basic ${loginPasswordBasic64}`)
       .send({
@@ -76,11 +84,13 @@ describe('tests for andpoint users', () => {
       })
       .expect(201);
 
+    questionId2 = res.body.id;
+
     //console.log(res.body);
   });
 
   it('create question3', async () => {
-    await request(app.getHttpServer())
+    const res = await request(app.getHttpServer())
       .post('/sa/quiz/questions')
       .set('Authorization', `Basic ${loginPasswordBasic64}`)
       .send({
@@ -88,10 +98,12 @@ describe('tests for andpoint users', () => {
         correctAnswers: ['6', 'six', 'шесть'],
       })
       .expect(201);
+
+    questionId3 = res.body.id;
   });
 
   it('create question4', async () => {
-    await request(app.getHttpServer())
+    const res = await request(app.getHttpServer())
       .post('/sa/quiz/questions')
       .set('Authorization', `Basic ${loginPasswordBasic64}`)
       .send({
@@ -99,10 +111,12 @@ describe('tests for andpoint users', () => {
         correctAnswers: ['7', 'seven', 'семь'],
       })
       .expect(201);
+
+    questionId4 = res.body.id;
   });
 
   it('create question5', async () => {
-    await request(app.getHttpServer())
+    const res = await request(app.getHttpServer())
       .post('/sa/quiz/questions')
       .set('Authorization', `Basic ${loginPasswordBasic64}`)
       .send({
@@ -110,10 +124,11 @@ describe('tests for andpoint users', () => {
         correctAnswers: ['8', 'eight', 'восемь'],
       })
       .expect(201);
+    questionId5 = res.body.id;
   });
 
   it('create question6', async () => {
-    await request(app.getHttpServer())
+    const res = await request(app.getHttpServer())
       .post('/sa/quiz/questions')
       .set('Authorization', `Basic ${loginPasswordBasic64}`)
       .send({
@@ -121,10 +136,11 @@ describe('tests for andpoint users', () => {
         correctAnswers: ['9', 'nine', 'девять'],
       })
       .expect(201);
+    questionId6 = res.body.id;
   });
 
   it('create question7', async () => {
-    await request(app.getHttpServer())
+    const res = await request(app.getHttpServer())
       .post('/sa/quiz/questions')
       .set('Authorization', `Basic ${loginPasswordBasic64}`)
       .send({
@@ -132,10 +148,11 @@ describe('tests for andpoint users', () => {
         correctAnswers: ['10', 'ten', 'десять'],
       })
       .expect(201);
+    questionId7 = res.body.id;
   });
 
   it('create question8', async () => {
-    await request(app.getHttpServer())
+    const res = await request(app.getHttpServer())
       .post('/sa/quiz/questions')
       .set('Authorization', `Basic ${loginPasswordBasic64}`)
       .send({
@@ -143,6 +160,7 @@ describe('tests for andpoint users', () => {
         correctAnswers: ['11', 'eleven', 'одинадцать'],
       })
       .expect(201);
+    questionId8 = res.body.id;
   });
 
   it('get questions + pagination', async () => {
@@ -156,6 +174,74 @@ describe('tests for andpoint users', () => {
     console.log('@@@@@@@@@@@@@@@@@@@@@@@@');
   });
 
+  it('update  Status Publish For Question2', async () => {
+    await request(app.getHttpServer())
+      .put(`/sa/quiz/questions/${questionId2}/publish`)
+      .set('Authorization', `Basic ${loginPasswordBasic64}`)
+      .send({
+        published: true,
+      })
+      .expect(204);
+  });
+
+  it('update  Status Publish For Question3', async () => {
+    await request(app.getHttpServer())
+      .put(`/sa/quiz/questions/${questionId3}/publish`)
+      .set('Authorization', `Basic ${loginPasswordBasic64}`)
+      .send({
+        published: true,
+      })
+      .expect(204);
+  });
+  it('update  Status Publish For Question4', async () => {
+    await request(app.getHttpServer())
+      .put(`/sa/quiz/questions/${questionId4}/publish`)
+      .set('Authorization', `Basic ${loginPasswordBasic64}`)
+      .send({
+        published: true,
+      })
+      .expect(204);
+  });
+
+  it('update  Status Publish For Question5', async () => {
+    await request(app.getHttpServer())
+      .put(`/sa/quiz/questions/${questionId5}/publish`)
+      .set('Authorization', `Basic ${loginPasswordBasic64}`)
+      .send({
+        published: true,
+      })
+      .expect(204);
+  });
+
+  it('update  Status Publish For Question6', async () => {
+    await request(app.getHttpServer())
+      .put(`/sa/quiz/questions/${questionId6}/publish`)
+      .set('Authorization', `Basic ${loginPasswordBasic64}`)
+      .send({
+        published: true,
+      })
+      .expect(204);
+  });
+
+  it('update  Status Publish For Question7', async () => {
+    await request(app.getHttpServer())
+      .put(`/sa/quiz/questions/${questionId7}/publish`)
+      .set('Authorization', `Basic ${loginPasswordBasic64}`)
+      .send({
+        published: true,
+      })
+      .expect(204);
+  });
+
+  it('update  Status Publish For Question8', async () => {
+    await request(app.getHttpServer())
+      .put(`/sa/quiz/questions/${questionId8}/publish`)
+      .set('Authorization', `Basic ${loginPasswordBasic64}`)
+      .send({
+        published: true,
+      })
+      .expect(204);
+  });
   /* it('create user', async () => {
      const res = await request(app.getHttpServer())
        .post('/sa/users')

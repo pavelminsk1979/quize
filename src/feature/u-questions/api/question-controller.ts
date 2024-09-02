@@ -17,6 +17,7 @@ import { QuestionInputModel } from './pipes/create-question-input-model';
 import { QuestionService } from '../services/question-service';
 import { QuestionQueryRepository } from '../repositories/question-query-repository';
 import { QueryParamsQuestionInputModel } from '../../../common/pipes/query-params-question-input-model';
+import { StatusPublishInputModel } from './pipes/status-publish-input-model';
 
 @UseGuards(AuthGuard)
 @Controller('sa/quiz/questions')
@@ -89,5 +90,26 @@ export class QuestionController {
     );
 
     return qestions;
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Put(':id/publish')
+  async updateStatusPublishForQuestion(
+    @Param('id') questionId: string,
+    @Body() statusPublishForQuestionInputModel: StatusPublishInputModel,
+  ) {
+    const isUpdateStatusPublishForQuestion: boolean =
+      await this.questionService.updateStatusPublishForQuestion(
+        questionId,
+        statusPublishForQuestionInputModel,
+      );
+
+    if (isUpdateStatusPublishForQuestion) {
+      return;
+    } else {
+      throw new NotFoundException(
+        'question  not exist :method-put ,url /sa/quiz/questions/id/publish',
+      );
+    }
   }
 }

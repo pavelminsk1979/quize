@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { QuestionInputModel } from '../api/pipes/create-question-input-model';
 import { CreateQuestion } from '../api/types/dto';
 import { QuestionRepository } from '../repositories/question-repository';
+import { StatusPublishInputModel } from '../api/pipes/status-publish-input-model';
 
 @Injectable()
 export class QuestionService {
@@ -51,5 +52,22 @@ export class QuestionService {
 
   async deleteQestionById(questionId: string) {
     return this.questionRepository.deleteQestionById(questionId);
+  }
+
+  async updateStatusPublishForQuestion(
+    questionId: string,
+    statusPublishForQuestionInputModel: StatusPublishInputModel,
+  ) {
+    const isExistQuestion =
+      await this.questionRepository.isExistQuestion(questionId);
+
+    if (!isExistQuestion) return false;
+
+    const newPublished = statusPublishForQuestionInputModel.published;
+
+    return this.questionRepository.updateStatusPublishForQuestion(
+      questionId,
+      newPublished,
+    );
   }
 }
