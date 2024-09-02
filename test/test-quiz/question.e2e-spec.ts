@@ -42,7 +42,7 @@ describe('tests for andpoint users', () => {
       })
       .expect(201);
 
-    console.log(res.body);
+    //console.log(res.body);
 
     questionId = res.body.id;
   });
@@ -57,6 +57,14 @@ describe('tests for andpoint users', () => {
       })
       .expect(204);
     //console.log(res.body);
+  });
+
+  it('delete  question by id', async () => {
+    await request(app.getHttpServer())
+      .delete(`/sa/quiz/questions/${questionId}`)
+      .set('Authorization', `Basic ${loginPasswordBasic64}`)
+
+      .expect(204);
   });
 
   /* it('create user', async () => {

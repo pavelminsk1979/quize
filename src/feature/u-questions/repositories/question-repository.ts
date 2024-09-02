@@ -84,6 +84,19 @@ export class QuestionRepository {
     return true;
   }
 
+  async deleteQestionById(questionId: string) {
+    const result = await this.questionRepository
+      .createQueryBuilder()
+      .delete()
+      .where('id=:questionId', { questionId })
+      .execute();
+
+    /*affected указывает на количество удаленных записей */
+
+    if (result.affected === 0) return false;
+    return true;
+  }
+
   /*  async isExistLogin(login: string) {
       const result = await this.usertypRepository.findOne({
         where: { login: login },
@@ -168,18 +181,5 @@ export class QuestionRepository {
   
       if (result.length === 0) return null;
       return result[0];
-    }*/
-
-  /*  async deleteUserById(userId: string) {
-      const result = await this.usertypRepository.delete({ id: userId });
-      /!* если удаление не удалось, result может быть undefined 
-   или содержать информацию об ошибке,*!/
-  
-      if (result.affected === 0) return false;
-      /!*Если удаление прошло успешно, result
-      содержать объект DeleteResult
-      --можете получить доступ к количеству удаленных
-      записей так: result.affected.*!/
-      return true;
     }*/
 }

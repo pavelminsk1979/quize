@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   HttpCode,
   HttpStatus,
   NotFoundException,
@@ -35,7 +36,9 @@ export class QuestionController {
       return question;
     } else {
       /*HTTP-код 404*/
-      throw new NotFoundException('user not found:andpoint-post,url-users');
+      throw new NotFoundException(
+        'error:andpoint-sa/quiz/questions,method-post',
+      );
     }
   }
 
@@ -55,6 +58,21 @@ export class QuestionController {
     } else {
       throw new NotFoundException(
         'question  not exist :method-put ,url /sa/quiz/questions/id',
+      );
+    }
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Delete(':id')
+  async deleteQestionById(@Param('id') questionId: string) {
+    const isDeleteQestionById =
+      await this.questionService.deleteQestionById(questionId);
+    if (isDeleteQestionById) {
+      return;
+    } else {
+      //соответствует HTTP статус коду 404
+      throw new NotFoundException(
+        'question not found:andpoint-sa/quiz/questions/id,method-delete',
       );
     }
   }

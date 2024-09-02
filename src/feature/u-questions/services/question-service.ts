@@ -49,7 +49,7 @@ export class QuestionService {
     );
   }
 
-  /*  async deleteUserById(userId: string) {
-      return this.userSqlTypeormRepository.deleteUserById(userId);
-    }*/
+  async deleteQestionById(questionId: string) {
+    return this.questionRepository.deleteQestionById(questionId);
+  }
 }
