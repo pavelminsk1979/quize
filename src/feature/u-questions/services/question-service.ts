@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { QuestionInputModel } from '../api/pipes/create-question-input-model';
 import { CreateQuestion } from '../api/types/dto';
 import { QuestionRepository } from '../repositories/question-repository';
-import { InsertResult } from 'typeorm';
 
 @Injectable()
 export class QuestionService {
@@ -31,15 +30,23 @@ export class QuestionService {
   ) {
     const { body, correctAnswers } = questionInputModel;
 
-    console.log(body);
-    console.log(correctAnswers);
-
     const isExistQuestion =
       await this.questionRepository.isExistQuestion(questionId);
 
     if (!isExistQuestion) return false;
 
-    return true;
+    const newUpdatedAt = new Date().toISOString();
+
+    const newBody = body;
+
+    const newCorrectAnswers = correctAnswers;
+
+    return this.questionRepository.updateQuestion(
+      questionId,
+      newUpdatedAt,
+      newBody,
+      newCorrectAnswers,
+    );
   }
 
   /*  async deleteUserById(userId: string) {

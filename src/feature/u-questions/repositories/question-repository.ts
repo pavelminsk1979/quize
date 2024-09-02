@@ -50,10 +50,37 @@ export class QuestionRepository {
   async isExistQuestion(questionId: string) {
     const result = await this.questionRepository
       .createQueryBuilder('q')
-      .where('q.id = : questionId', { questionId })
+      .where('q.id = :questionId', { questionId })
       .getOne();
 
     if (!result) return false;
+    return true;
+  }
+
+  async updateQuestion(
+    questionId: string,
+    newUpdatedAt: string,
+    newBody: string,
+    newCorrectAnswers: string[],
+  ) {
+    const result = await this.questionRepository
+      .createQueryBuilder()
+      .update(Question)
+      .set({
+        body: newBody,
+        correctAnswers: newCorrectAnswers,
+        updatedAt: newUpdatedAt,
+      })
+      .where('id=:questionId', { questionId })
+      .execute();
+
+    /* result это вот такая структура 
+ UpdateResult { generatedMaps: [], raw: [], affected: 0 }
+  affected-- это количество измененных саписей 
+*/
+
+    if (result.affected === 0) return false;
+
     return true;
   }
 

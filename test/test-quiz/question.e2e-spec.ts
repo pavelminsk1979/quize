@@ -7,6 +7,8 @@ import cookieParser from 'cookie-parser';
 describe('tests for andpoint users', () => {
   let app;
 
+  let questionId;
+
   const loginPasswordBasic64 = 'YWRtaW46cXdlcnR5';
 
   beforeAll(async () => {
@@ -41,6 +43,20 @@ describe('tests for andpoint users', () => {
       .expect(201);
 
     console.log(res.body);
+
+    questionId = res.body.id;
+  });
+
+  it('update  question', async () => {
+    const res = await request(app.getHttpServer())
+      .put(`/sa/quiz/questions/${questionId}`)
+      .set('Authorization', `Basic ${loginPasswordBasic64}`)
+      .send({
+        body: 'update 2+2? Ответ словом или числом',
+        correctAnswers: ['up-4', 'up-four', 'up-четыре'],
+      })
+      .expect(204);
+    //console.log(res.body);
   });
 
   /* it('create user', async () => {
