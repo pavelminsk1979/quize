@@ -4,32 +4,58 @@ import {
   HttpCode,
   HttpStatus,
   NotFoundException,
+  Param,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '../../../common/guard/auth-guard';
-import { CreateQuestionInputModel } from './pipes/create-question-input-model';
+import { QuestionInputModel } from './pipes/create-question-input-model';
 import { QuestionService } from '../services/question-service';
+import { QuestionQueryRepository } from '../repositories/question-query-repository';
 
 @UseGuards(AuthGuard)
 @Controller('sa/quiz/questions')
 export class QuestionController {
-  constructor(protected questionService: QuestionService) {}
+  constructor(
+    protected questionService: QuestionService,
+    protected questionQueryRepository: QuestionQueryRepository,
+  ) {}
 
   @HttpCode(HttpStatus.CREATED)
   @Post()
-  async createQuestion(
-    @Body() createQuestionInputModel: CreateQuestionInputModel,
-  ) {
-    const question = await this.questionService.createQuestion(
-      createQuestionInputModel,
-    );
+  async createQuestion(@Body() questionInputModel: QuestionInputModel) {
+    const questionId =
+      await this.questionService.createQuestion(questionInputModel);
+
+    const question =
+      await this.questionQueryRepository.getQuestionById(questionId);
 
     if (question) {
       return question;
     } else {
       /*HTTP-код 404*/
       throw new NotFoundException('user not found:andpoint-post,url-users');
+    }
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Put(':id')
+  async updateQuestion(
+    @Param('id') questionId: string,
+    @Body() questionInputModel: QuestionInputModel,
+  ) {
+    const isUpdateQuestion: boolean = await this.questionService.updateQuestion(
+      questionId,
+      questionInputModel,
+    );
+
+    if (isUpdateQuestion) {
+      return;
+    } else {
+      throw new NotFoundException(
+        'question  not exist :method-put ,url /sa/quiz/questions/id',
+      );
     }
   }
 

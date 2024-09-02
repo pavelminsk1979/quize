@@ -53,7 +53,8 @@ import { BlogService } from './feature/blogs/services/blog-service';
 import { Question } from './feature/u-questions/domains/question.entity';
 import { QuestionController } from './feature/u-questions/api/question-controller';
 import { QuestionService } from './feature/u-questions/services/question-service';
-import { QuestionRepository } from './feature/users/repositories/question-repository';
+import { QuestionRepository } from './feature/u-questions/repositories/question-repository';
+import { QuestionQueryRepository } from './feature/u-questions/repositories/question-query-repository';
 
 dotenv.config();
 
@@ -157,6 +158,7 @@ dotenv.config();
     BlogService,
     QuestionService,
     QuestionRepository,
+    QuestionQueryRepository,
   ],
 })
 export class AppModule {}

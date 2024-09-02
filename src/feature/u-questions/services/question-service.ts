@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { CreateQuestionInputModel } from '../api/pipes/create-question-input-model';
-import { CreateQuestion } from '../api/tupes/dto';
-import { Question } from '../domains/question.entity';
-import { QuestionRepository } from '../../users/repositories/question-repository';
+import { QuestionInputModel } from '../api/pipes/create-question-input-model';
+import { CreateQuestion } from '../api/types/dto';
+import { QuestionRepository } from '../repositories/question-repository';
+import { InsertResult } from 'typeorm';
 
 @Injectable()
 export class QuestionService {
   constructor(protected questionRepository: QuestionRepository) {}
 
-  async createQuestion(createQuestionInputModel: CreateQuestionInputModel) {
-    const { body, correctAnswers } = createQuestionInputModel;
+  async createQuestion(questionInputModel: QuestionInputModel) {
+    const { body, correctAnswers } = questionInputModel;
 
     const newQuestion: CreateQuestion = {
       body,
@@ -19,19 +19,27 @@ export class QuestionService {
       published: false,
     };
 
-    const result: Question | null =
+    const result: string =
       await this.questionRepository.createNewQuestion(newQuestion);
 
-    if (!result) return null;
+    return result;
+  }
 
-    return {
-      id: String(result.id),
-      body: result.body,
-      correctAnswers: result.correctAnswers,
-      createdAt: result.createdAt,
-      updatedAt: result.updatedAt,
-      published: result.published,
-    };
+  async updateQuestion(
+    questionId: string,
+    questionInputModel: QuestionInputModel,
+  ) {
+    const { body, correctAnswers } = questionInputModel;
+
+    console.log(body);
+    console.log(correctAnswers);
+
+    const isExistQuestion =
+      await this.questionRepository.isExistQuestion(questionId);
+
+    if (!isExistQuestion) return false;
+
+    return true;
   }
 
   /*  async deleteUserById(userId: string) {

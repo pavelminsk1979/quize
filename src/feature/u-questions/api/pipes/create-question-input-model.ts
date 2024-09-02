@@ -1,6 +1,6 @@
 import { IsArray, IsNotEmpty, IsString, Length } from 'class-validator';
 
-export class CreateQuestionInputModel {
+export class QuestionInputModel {
   @IsString()
   @IsNotEmpty()
   @Length(10, 500, {

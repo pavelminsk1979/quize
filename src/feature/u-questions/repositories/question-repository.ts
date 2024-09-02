@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { CreateQuestion } from '../../u-questions/api/tupes/dto';
-import { Question } from '../../u-questions/domains/question.entity';
+import { CreateQuestion } from '../api/types/dto';
+import { Question } from '../domains/question.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InsertResult, Repository } from 'typeorm';
 
 @Injectable()
 export class QuestionRepository {
@@ -12,15 +12,49 @@ export class QuestionRepository {
   ) {}
 
   async createNewQuestion(newQuestion: CreateQuestion) {
-    const question = new Question();
-    question.body = newQuestion.body;
-    question.correctAnswers = newQuestion.correctAnswers;
-    question.createdAt = newQuestion.createdAt;
-    question.updatedAt = newQuestion.updatedAt;
-    question.published = newQuestion.published;
+    const result: InsertResult = await this.questionRepository
+      .createQueryBuilder()
+      .insert()
+      .into(Question)
+      .values({
+        body: newQuestion.body,
+        correctAnswers: newQuestion.correctAnswers,
+        createdAt: newQuestion.createdAt,
+        updatedAt: newQuestion.updatedAt,
+        published: newQuestion.published,
+      })
+      .execute();
 
-    const result = await this.questionRepository.save(question);
-    return result;
+    /*тут структура
+        InsertResult {
+          identifiers: [ { id: 3 } ],
+            generatedMaps: [ { id: 3 } ],
+            raw: [ { id: 3 } ]
+        }*/
+
+    return result.identifiers[0].id;
+  }
+
+  /*  async createNewQuestion(newQuestion: CreateQuestion) {
+      const question = new Question();
+      question.body = newQuestion.body;
+      question.correctAnswers = newQuestion.correctAnswers;
+      question.createdAt = newQuestion.createdAt;
+      question.updatedAt = newQuestion.updatedAt;
+      question.published = newQuestion.published;
+  
+      const result = await this.questionRepository.save(question);
+      return result;
+    }*/
+
+  async isExistQuestion(questionId: string) {
+    const result = await this.questionRepository
+      .createQueryBuilder('q')
+      .where('q.id = : questionId', { questionId })
+      .getOne();
+
+    if (!result) return false;
+    return true;
   }
 
   /*  async isExistLogin(login: string) {
