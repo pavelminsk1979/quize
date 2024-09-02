@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CommentWithLikeInfo } from '../types/views';
 import { QueryParamsInputModel } from '../../../common/pipes/query-params-input-model';
-import { LikeStatus } from '../../../common/types';
+import { LikeStatus, SortDir } from '../../../common/types';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -10,7 +10,6 @@ import { Commenttyp } from '../domaims/commenttyp.entity';
 import { LikeStatusForCommentTyp } from '../../like-status-for-comment/domain/typ-like-status-for-comment.entity';
 import { TypLikeStatusForCommentSqlRepository } from '../../like-status-for-comment/repositories/typ-like-status-for-comment-sql-repository';
 import { PostSqlTypeormRepository } from '../../posts/repositories/post-sql-typeorm-repository';
-import { SortDir } from '../../blogs/api/types/dto';
 
 @Injectable()
 export class CommentQuerySqlTypeormRepository {

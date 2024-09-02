@@ -32,7 +32,7 @@ describe('tests for andpoint users', () => {
     await app.close();
   });
 
-  it('create question', async () => {
+  it('create question1', async () => {
     const res = await request(app.getHttpServer())
       .post('/sa/quiz/questions')
       .set('Authorization', `Basic ${loginPasswordBasic64}`)
@@ -47,8 +47,8 @@ describe('tests for andpoint users', () => {
     questionId = res.body.id;
   });
 
-  it('update  question', async () => {
-    const res = await request(app.getHttpServer())
+  it('update  question1', async () => {
+    await request(app.getHttpServer())
       .put(`/sa/quiz/questions/${questionId}`)
       .set('Authorization', `Basic ${loginPasswordBasic64}`)
       .send({
@@ -56,15 +56,104 @@ describe('tests for andpoint users', () => {
         correctAnswers: ['up-4', 'up-four', 'up-четыре'],
       })
       .expect(204);
-    //console.log(res.body);
   });
 
-  it('delete  question by id', async () => {
+  it('delete  question1 by id', async () => {
     await request(app.getHttpServer())
       .delete(`/sa/quiz/questions/${questionId}`)
       .set('Authorization', `Basic ${loginPasswordBasic64}`)
 
       .expect(204);
+  });
+
+  it('create question2', async () => {
+    await request(app.getHttpServer())
+      .post('/sa/quiz/questions')
+      .set('Authorization', `Basic ${loginPasswordBasic64}`)
+      .send({
+        body: '2+3? Ответ словом или числом',
+        correctAnswers: ['5', 'five', 'пять'],
+      })
+      .expect(201);
+
+    //console.log(res.body);
+  });
+
+  it('create question3', async () => {
+    await request(app.getHttpServer())
+      .post('/sa/quiz/questions')
+      .set('Authorization', `Basic ${loginPasswordBasic64}`)
+      .send({
+        body: '2+4? Ответ словом или числом',
+        correctAnswers: ['6', 'six', 'шесть'],
+      })
+      .expect(201);
+  });
+
+  it('create question4', async () => {
+    await request(app.getHttpServer())
+      .post('/sa/quiz/questions')
+      .set('Authorization', `Basic ${loginPasswordBasic64}`)
+      .send({
+        body: '2+5? Ответ словом или числом',
+        correctAnswers: ['7', 'seven', 'семь'],
+      })
+      .expect(201);
+  });
+
+  it('create question5', async () => {
+    await request(app.getHttpServer())
+      .post('/sa/quiz/questions')
+      .set('Authorization', `Basic ${loginPasswordBasic64}`)
+      .send({
+        body: '2+6? Ответ словом или числом',
+        correctAnswers: ['8', 'eight', 'восемь'],
+      })
+      .expect(201);
+  });
+
+  it('create question6', async () => {
+    await request(app.getHttpServer())
+      .post('/sa/quiz/questions')
+      .set('Authorization', `Basic ${loginPasswordBasic64}`)
+      .send({
+        body: '2+7? Ответ словом или числом',
+        correctAnswers: ['9', 'nine', 'девять'],
+      })
+      .expect(201);
+  });
+
+  it('create question7', async () => {
+    await request(app.getHttpServer())
+      .post('/sa/quiz/questions')
+      .set('Authorization', `Basic ${loginPasswordBasic64}`)
+      .send({
+        body: '2+8? Ответ словом или числом',
+        correctAnswers: ['10', 'ten', 'десять'],
+      })
+      .expect(201);
+  });
+
+  it('create question8', async () => {
+    await request(app.getHttpServer())
+      .post('/sa/quiz/questions')
+      .set('Authorization', `Basic ${loginPasswordBasic64}`)
+      .send({
+        body: '2+9? Ответ словом или числом',
+        correctAnswers: ['11', 'eleven', 'одинадцать'],
+      })
+      .expect(201);
+  });
+
+  it('get questions + pagination', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/sa/quiz/questions')
+      .set('Authorization', `Basic ${loginPasswordBasic64}`)
+
+      .expect(200);
+    console.log('@@@@@@@@@@@@@@@@@@@@@@@@');
+    console.log(res.body);
+    console.log('@@@@@@@@@@@@@@@@@@@@@@@@');
   });
 
   /* it('create user', async () => {

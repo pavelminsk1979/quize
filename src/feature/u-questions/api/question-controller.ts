@@ -2,18 +2,21 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpCode,
   HttpStatus,
   NotFoundException,
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '../../../common/guard/auth-guard';
 import { QuestionInputModel } from './pipes/create-question-input-model';
 import { QuestionService } from '../services/question-service';
 import { QuestionQueryRepository } from '../repositories/question-query-repository';
+import { QueryParamsQuestionInputModel } from '../../../common/pipes/query-params-question-input-model';
 
 @UseGuards(AuthGuard)
 @Controller('sa/quiz/questions')
@@ -77,25 +80,14 @@ export class QuestionController {
     }
   }
 
-  /*  @Get()
-    async getUsers(@Query() queryParamsUserInputModel: QueryParamsInputModel) {
-      const users = await this.userQuerySqlRepository.getUsers(
-        queryParamsUserInputModel,
-      );
-      return users;
-    }*/
+  @Get()
+  async getQestions(
+    @Query() queryParamsQuestionInputModel: QueryParamsQuestionInputModel,
+  ) {
+    const qestions = await this.questionQueryRepository.getQestions(
+      queryParamsQuestionInputModel,
+    );
 
-  /*  @HttpCode(HttpStatus.NO_CONTENT)
-    @Delete(':id')
-    async deleteUserById(@Param('id') userId: string) {
-      const isDeleteUserById = await this.usersService.deleteUserById(userId);
-      if (isDeleteUserById) {
-        return;
-      } else {
-        /!*соответствует HTTP статус коду 404*!/
-        throw new NotFoundException(
-          'user not found:andpoint-delete,url-users/id',
-        );
-      }
-    }*/
+    return qestions;
+  }
 }

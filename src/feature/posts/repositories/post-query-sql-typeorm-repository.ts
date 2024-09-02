@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { QueryParamsInputModel } from '../../../common/pipes/query-params-input-model';
-import { LikeStatus } from '../../../common/types';
+import { LikeStatus, SortDir } from '../../../common/types';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { NewestLikes, PostWithLikesInfo } from '../api/types/views';
-import { SortDir } from '../../blogs/api/types/dto';
 import { Posttyp } from '../domains/posttyp.entity';
 import { BlogSqlTypeormRepository } from '../../blogs/repositories/blog-sql-typeorm-repository';
 import { Blogtyp } from '../../blogs/domains/blogtyp.entity';

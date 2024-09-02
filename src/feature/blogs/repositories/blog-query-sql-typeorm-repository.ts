@@ -5,8 +5,8 @@ import { QueryParamsInputModel } from '../../../common/pipes/query-params-input-
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { SortDir } from '../api/types/dto';
 import { Blogtyp } from '../domains/blogtyp.entity';
+import { SortDir } from '../../../common/types';
 
 @Injectable()
 export class BlogQuerySqlTypeormRepository {

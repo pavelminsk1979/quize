@@ -5,3 +5,5 @@ export enum LikeStatus {
 
   DISLIKE = 'Dislike',
 }
+
+export type SortDir = 'ASC' | 'DESC';
