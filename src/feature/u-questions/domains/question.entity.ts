@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { RandomQuestion } from '../../u-games/domains/random-question.entity';
 
 @Entity()
 /*не создает таблицы без
@@ -22,4 +23,11 @@ export class Question {
 
   @Column()
   public published: boolean;
+
+  @OneToMany(() => RandomQuestion, 'question')
+  public randomQuestion: RandomQuestion;
 }
+
+/*
+один вопрос--- во многих РАНДОМзаписях(каждая
+запись для разной игры )*/

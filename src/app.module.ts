@@ -55,7 +55,9 @@ import { QuestionController } from './feature/u-questions/api/question-controlle
 import { QuestionService } from './feature/u-questions/services/question-service';
 import { QuestionRepository } from './feature/u-questions/repositories/question-repository';
 import { QuestionQueryRepository } from './feature/u-questions/repositories/question-query-repository';
-import { Game } from './feature/u-questions/domains/game.entity';
+import { Game } from './feature/u-games/domains/game.entity';
+import { ConnectionTabl } from './feature/u-games/domains/connection.entity';
+import { RandomQuestion } from './feature/u-games/domains/random-question.entity';
 
 dotenv.config();
 
@@ -88,6 +90,8 @@ dotenv.config();
       LikeStatusForCommentTyp,
       Question,
       Game,
+      ConnectionTabl,
+      RandomQuestion,
     ]),
 
     MongooseModule.forRootAsync({
