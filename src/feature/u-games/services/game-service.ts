@@ -1,16 +1,59 @@
 import { Injectable } from '@nestjs/common';
 import { ConnectionRepository } from '../repositories/connection-repository';
+import { ConnectionTabl } from '../domains/connection.entity';
+import { GameRepository } from '../repositories/game-repository';
+import { Connection, CreateGame } from '../api/types/dto';
+import { QuestionRepository } from '../../u-questions/repositories/question-repository';
 
 @Injectable()
 export class GameService {
-  constructor(protected connectionRepository: ConnectionRepository) {}
+  constructor(
+    protected connectionRepository: ConnectionRepository,
+    protected gameRepository: GameRepository,
+    protected questionRepository: QuestionRepository,
+  ) {}
 
   async startGame(userId: string) {
     /* есть ли в таблице ConnectionTabl  запись
      со статусом   status:panding*/
 
-    const isPandingGame: boolean =
+    const connectionTabl: ConnectionTabl | null =
       await this.connectionRepository.findRowPanding();
+
+    if (!connectionTabl) {
+      /*     если нет ожидающего игрока, - создаю ИГРУ + 
+             рандомные 5 вопросов к игре + создаю запись
+           в таблице ConnectionTabl  с status:panding*/
+
+      //создаю ИГРУ
+      const newGame: CreateGame = {
+        createdAt: new Date().toISOString(),
+        isFinished: false,
+      };
+      const gameId: string = await this.gameRepository.createGame(newGame);
+
+      /*создаю запись
+      в таблице ConnectionTabl  с status:panding*/
+      const newConnectionTabl: Connection = {
+        createdAt: new Date().toISOString(),
+        status: 'panding',
+        idGameFK: gameId,
+        idUserFK: userId,
+      };
+
+      const connectionId: string =
+        await this.connectionRepository.createNewConnection(newConnectionTabl);
+
+      /*рандомные 5 вопросов к игре
+       -- 5 вопросов из таблицы Question
+       --- потом делаю в таблице RandomQuestion 5 записей
+       и в каждой записи одинаковые  gameId */
+      const arrayRandomQuestions =
+        await this.questionRepository.getRandomQuestions();
+    }
+
+    /*  а если один игрок уже ожидал - тогда 
+      ЗАПУСКАЮ ИГРУ*/
 
     return userId;
   }

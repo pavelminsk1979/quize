@@ -61,6 +61,7 @@ import { RandomQuestion } from './feature/u-games/domains/random-question.entity
 import { GameController } from './feature/u-games/api/game-controller';
 import { GameService } from './feature/u-games/services/game-service';
 import { ConnectionRepository } from './feature/u-games/repositories/connection-repository';
+import { GameRepository } from './feature/u-games/repositories/game-repository';
 
 dotenv.config();
 
@@ -171,6 +172,7 @@ dotenv.config();
     QuestionQueryRepository,
     GameService,
     ConnectionRepository,
+    GameRepository,
   ],
 })
 export class AppModule {}

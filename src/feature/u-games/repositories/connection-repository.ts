@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InsertResult, Repository } from 'typeorm';
 import { ConnectionTabl } from '../domains/connection.entity';
+import { Connection } from '../api/types/dto';
+import { Game } from '../domains/game.entity';
 
 @Injectable()
 export class ConnectionRepository {
@@ -10,7 +12,40 @@ export class ConnectionRepository {
     private readonly connectionRepository: Repository<ConnectionTabl>,
   ) {}
 
-  async findRowPanding() {}
+  async findRowPanding() {
+    const result = await this.connectionRepository
+      .createQueryBuilder('c')
+      .where('c.status = :status', { status: 'panding' })
+      .getOne();
+
+    /* запрос  будет возвращать либо 
+     объект - запись из таблицы ConnectionTabl, либо null*/
+
+    return result;
+  }
+
+  async createNewConnection(newConnectionTabl: Connection) {
+    const result: InsertResult = await this.connectionRepository
+      .createQueryBuilder()
+      .insert()
+      .into(ConnectionTabl)
+      .values({
+        createdAt: newConnectionTabl.createdAt,
+        status: newConnectionTabl.status,
+        idGameFK: newConnectionTabl.idGameFK,
+        idUserFK: newConnectionTabl.idUserFK,
+      })
+      .execute();
+
+    /*тут структура
+       InsertResult {
+         identifiers: [ { id: 3 } ],
+           generatedMaps: [ { id: 3 } ],
+           raw: [ { id: 3 } ]
+       }*/
+
+    return String(result.identifiers[0].id);
+  }
 
   /*  async createNewQuestion(newQuestion: CreateQuestion) {
       const result: InsertResult = await this.questionRepository

@@ -223,7 +223,7 @@ pagesCount это число
           будет делатся ВЬЮМОДЕЛЬ которую ожидает 
           фронтенд, внутри будет информация об 
           посте и об лайках к этому посту*/
-      debugger;
+
       if (arrayPostLikeManyPostId.length === 0) {
         const viewPostWithInfoLike = this.createViewModelOnePostWithLikeInfo(
           userId,
