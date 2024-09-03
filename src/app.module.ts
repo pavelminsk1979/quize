@@ -58,6 +58,8 @@ import { QuestionQueryRepository } from './feature/u-questions/repositories/ques
 import { Game } from './feature/u-games/domains/game.entity';
 import { ConnectionTabl } from './feature/u-games/domains/connection.entity';
 import { RandomQuestion } from './feature/u-games/domains/random-question.entity';
+import { GameController } from './feature/u-games/api/game-controller';
+import { GameService } from './feature/u-games/services/game-service';
 
 dotenv.config();
 
@@ -133,6 +135,7 @@ dotenv.config();
     SecurityDeviceController,
     SaBlogController,
     QuestionController,
+    GameController,
   ],
   /* все сервисы приложения должны тут добавлены */
   providers: [
@@ -165,6 +168,7 @@ dotenv.config();
     QuestionService,
     QuestionRepository,
     QuestionQueryRepository,
+    GameService,
   ],
 })
 export class AppModule {}
