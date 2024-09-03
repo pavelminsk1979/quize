@@ -55,6 +55,7 @@ import { QuestionController } from './feature/u-questions/api/question-controlle
 import { QuestionService } from './feature/u-questions/services/question-service';
 import { QuestionRepository } from './feature/u-questions/repositories/question-repository';
 import { QuestionQueryRepository } from './feature/u-questions/repositories/question-query-repository';
+import { Game } from './feature/u-questions/domains/game.entity';
 
 dotenv.config();
 
@@ -86,6 +87,7 @@ dotenv.config();
       Commenttyp,
       LikeStatusForCommentTyp,
       Question,
+      Game,
     ]),
 
     MongooseModule.forRootAsync({
