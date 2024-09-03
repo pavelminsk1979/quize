@@ -1,10 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import { ConnectionRepository } from '../repositories/connection-repository';
 
 @Injectable()
 export class GameService {
-  constructor() {}
+  constructor(protected connectionRepository: ConnectionRepository) {}
 
   async startGame(userId: string) {
+    /* есть ли в таблице ConnectionTabl  запись
+     со статусом   status:panding*/
+
+    const isPandingGame: boolean =
+      await this.connectionRepository.findRowPanding();
+
     return userId;
   }
 }
