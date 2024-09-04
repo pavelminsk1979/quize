@@ -52,5 +52,5 @@ export type RequestFirstPlayer = {
   secondPlayerProgress: null;
   questions: DataQuestion[];
   status: GameStatus;
-  pairCreatedDate: string;
+  pairCreatedDate: string; //когда создан первый игрок
 };

@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InsertResult, Repository } from 'typeorm';
-import { Game } from '../domains/game.entity';
-import { CreateGame, Random } from '../api/types/dto';
+import { Random } from '../api/types/dto';
 import { RandomQuestion } from '../domains/random-question.entity';
 
 @Injectable()
@@ -34,6 +33,16 @@ export class RandomQuestionRepository {
        }*/
 
     return String(result.identifiers[0].idRandom);
+  }
+
+  async getQuestionsForGame(gameId: string) {
+    const result = await this.randomQuestionRepository
+      .createQueryBuilder('rand')
+      .leftJoinAndSelect('rand.question', 'question')
+      .where('rand.idGameFK= :gameId', { gameId })
+      .getMany();
+
+    return result;
   }
 
   /*  async getGameById(gameId: string) {

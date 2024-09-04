@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConnectionRepository } from '../repositories/connection-repository';
 import { ConnectionTabl } from '../domains/connection.entity';
 import { GameRepository } from '../repositories/game-repository';
-import { Connection, CreateGame, Random } from '../api/types/dto';
+import { Connection, CreateGame, GameStatus, Random } from '../api/types/dto';
 import { QuestionRepository } from '../../u-questions/repositories/question-repository';
 import { UserSqlTypeormRepository } from '../../users/repositories/user-sql-typeorm-repository';
 import { Question } from '../../u-questions/domains/question.entity';
@@ -109,8 +109,45 @@ export class GameService {
      ибо не нужно на этом этапе */
       await Promise.all(promisesPanding);
 
+      /* вопросы надо взять из таблицы однообразно
+       - тобишь имея АЙДИшкуИГРЫ возму вопросы и отдам
+       их первому игроку(БУДЕТ В ОПРЕДЕЛЕННОМ
+     ПОРЯДКЕ ОНИ ОТДАНЫ)..и темже методом попользуюсь
+       когда второй игрок вступит в игру
+       --У ДВОИХ ИГРОКОВ ОДИНАКОВЫЙ ПОРЯДОК
+       ВОПРОСОВ БУДЕТ */
+
+      const questionForGame =
+        await this.randomQuestionRepository.getQuestionsForGame(gameId);
+
+      /*     вопросы фронтенду надо отдать в форме 
+           массив  {id: string;body: string;}*/
+      const viewQuestions = questionForGame.map((el) => {
+        return {
+          id: el.idQuestionFK,
+          body: el.question.body,
+        };
+      });
+
       /* далее надо собрать ответ и отдать на фронт
-      структура ответа прописана в свагере*/
+      структура ответа прописана в свагере  
+      типизация  - RequestFirstPlayer*/
+
+      return {
+        id: gameId,
+        firstPlayerProgress: {
+          answers: [],
+          player: {
+            id: user.id,
+            login: user.login,
+          },
+          score: 0,
+        },
+        secondPlayerProgress: null,
+        questions: viewQuestions,
+        status: GameStatus.PANDING,
+        pairCreatedDate: '111111',
+      };
     }
 
     /*  а если один игрок уже ожидал - тогда 
