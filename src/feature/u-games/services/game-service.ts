@@ -63,36 +63,54 @@ export class GameService {
         game: game,
       };
 
-      const connectionId: string =
-        await this.connectionRepository.createNewConnection(newConnectionTabl);
+      /*создаю запись в таблице, но ничего не возвращаю
+      ибо не нужно на этом этапе */
+      await this.connectionRepository.createNewConnection(newConnectionTabl);
 
       /*рандомные 5 вопросов к игре
        -- 5 вопросов из таблицы Question
        --- потом делаю в таблице RandomQuestion 5 записей
        и в каждой записи одинаковые  gameId */
-      const arrayRandomQuestions =
+      const arrayRandomQuestions: Question[] =
         await this.questionRepository.getRandomQuestions();
 
-      const randRow: Question = arrayRandomQuestions[0];
+      const promisesPanding = arrayRandomQuestions.map(async (el: Question) => {
+        /*возму запись из таблицы Question -- она 
+        нужна чтоб связь делать с таблицей RandomQuestion*/
 
-      const question = await this.questionRepository.getQuestionById(
-        String(randRow.id),
-      );
+        const question = await this.questionRepository.getQuestionById(
+          String(el.id),
+        );
 
-      if (!question) return null;
+        if (!question) return null;
 
-      const newRandom: Random = {
-        createdAt: new Date().toISOString(),
-        idGameFK: gameId,
-        idQuestionFK: String(randRow.id),
-        game: game,
-        question: question,
-      };
+        /*созданый обьект - это одна запись в таблицу RandomQuestion
+                и будет 5 таких записей и у каждой записи будут
+                одинаковые gameId  но разные idQuestionFK 
+                ТОБИШЬ ДЛЯ ОДНОЙ ИГРЫ ПЯТЬ РАЗНЫХ ВОПРОСОВ*/
 
-      const randomQusetionRowId =
-        await this.randomQuestionRepository.createRandomRow(newRandom);
-      console.log(randomQusetionRowId);
-      return randomQusetionRowId;
+        const newRowRandomQuestion: Random = {
+          createdAt: new Date().toISOString(),
+          idGameFK: gameId,
+          idQuestionFK: String(el.id),
+          game: game,
+          question: question,
+        };
+
+        const randomQusetionRowId =
+          await this.randomQuestionRepository.createRandomRow(
+            newRowRandomQuestion,
+          );
+
+        return randomQusetionRowId;
+      });
+
+      /*создаю записи в таблице, но ничего не возвращаю
+     ибо не нужно на этом этапе */
+      await Promise.all(promisesPanding);
+
+      /* далее надо собрать ответ и отдать на фронт
+      структура ответа прописана в свагере*/
     }
 
     /*  а если один игрок уже ожидал - тогда 
