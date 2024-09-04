@@ -11,6 +11,16 @@ export class QuestionRepository {
     private readonly questionRepository: Repository<Question>,
   ) {}
 
+  async getQuestionById(questionId: string) {
+    const result = await this.questionRepository
+      .createQueryBuilder('q')
+      .where('q.id = :questionId', { questionId })
+      .getOne();
+
+    if (!result) return false;
+    return result;
+  }
+
   async getRandomQuestions() {
     const result = await this.questionRepository
       .createQueryBuilder()

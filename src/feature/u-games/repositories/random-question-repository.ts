@@ -1,40 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InsertResult, Repository } from 'typeorm';
-import { ConnectionTabl } from '../domains/connection.entity';
-import { Connection } from '../api/types/dto';
+import { Game } from '../domains/game.entity';
+import { CreateGame, Random } from '../api/types/dto';
+import { RandomQuestion } from '../domains/random-question.entity';
 
 @Injectable()
-export class ConnectionRepository {
+export class RandomQuestionRepository {
   constructor(
-    @InjectRepository(ConnectionTabl)
-    private readonly connectionRepository: Repository<ConnectionTabl>,
+    @InjectRepository(RandomQuestion)
+    private readonly randomQuestionRepository: Repository<RandomQuestion>,
   ) {}
 
-  async findRowPanding() {
-    const result = await this.connectionRepository
-      .createQueryBuilder('c')
-      .where('c.status = :status', { status: 'panding' })
-      .getOne();
-
-    /* запрос  будет возвращать либо 
-     объект - запись из таблицы ConnectionTabl, либо null*/
-
-    return result;
-  }
-
-  async createNewConnection(newConnectionTabl: Connection) {
-    const result: InsertResult = await this.connectionRepository
+  async createRandomRow(newRandom: Random) {
+    const result: InsertResult = await this.randomQuestionRepository
       .createQueryBuilder()
       .insert()
-      .into(ConnectionTabl)
+      .into(RandomQuestion)
       .values({
-        createdAt: newConnectionTabl.createdAt,
-        status: newConnectionTabl.status,
-        idGameFK: newConnectionTabl.idGameFK,
-        idUserFK: newConnectionTabl.idUserFK,
-        usertyp: newConnectionTabl.usertyp,
-        game: newConnectionTabl.game,
+        createdAt: newRandom.createdAt,
+        idGameFK: newRandom.idGameFK,
+        idQuestionFK: newRandom.idQuestionFK,
+        game: newRandom.game,
+        question: newRandom.question,
       })
       .execute();
 
@@ -45,8 +33,31 @@ export class ConnectionRepository {
            raw: [ { id: 3 } ]
        }*/
 
-    return String(result.identifiers[0].id);
+    return String(result.identifiers[0].idRandom);
   }
+
+  /*  async getGameById(gameId: string) {
+    const result = await this.gameRepository
+      .createQueryBuilder('g')
+      .where('g.idGame = :gameId', { gameId })
+      .getOne();
+
+    if (!result) return null;
+
+    return result;
+  }*/
+
+  /*  async findRowPanding() {
+      const result = await this.connectionRepository
+        .createQueryBuilder('c')
+        .where('c.status = :status', { status: 'panding' })
+        .getOne();
+  
+      /!* запрос  будет возвращать либо 
+       объект - запись из таблицы ConnectionTabl, либо null*!/
+  
+      return result;
+    }*/
 
   /*  async createNewQuestion(newQuestion: CreateQuestion) {
       const result: InsertResult = await this.questionRepository

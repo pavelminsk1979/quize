@@ -10,6 +10,9 @@ import { LikeStatusForPostTyp } from '../like-status-for-post/domain/typ-like-st
 import { Commenttyp } from '../comments/domaims/commenttyp.entity';
 import { LikeStatusForCommentTyp } from '../like-status-for-comment/domain/typ-like-status-for-comment.entity';
 import { Question } from '../u-questions/domains/question.entity';
+import { ConnectionTabl } from '../u-games/domains/connection.entity';
+import { RandomQuestion } from '../u-games/domains/random-question.entity';
+import { Game } from '../u-games/domains/game.entity';
 
 @Controller('testing')
 export class TestController {
@@ -30,11 +33,21 @@ export class TestController {
     private readonly likeForCommentTypRepository: Repository<LikeStatusForCommentTyp>,
     @InjectRepository(Question)
     private readonly questionRepository: Repository<Question>,
+    @InjectRepository(ConnectionTabl)
+    private readonly connectionRepository: Repository<ConnectionTabl>,
+    @InjectRepository(RandomQuestion)
+    private readonly randomQuestionRepository: Repository<RandomQuestion>,
+    @InjectRepository(Game)
+    private readonly gameRepository: Repository<Game>,
   ) {}
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete('all-data')
   async deleteAllData() {
+    await this.randomQuestionRepository.delete({});
+    await this.questionRepository.delete({});
+    await this.connectionRepository.delete({});
+    await this.gameRepository.delete({});
     await this.likeForCommentTypRepository.delete({});
     await this.commenttypRepository.delete({});
     await this.likeForPostTypRepository.delete({});
@@ -42,7 +55,6 @@ export class TestController {
     await this.usertypRepository.delete({});
     await this.posttypRepository.delete({});
     await this.blogtypRepository.delete({});
-    await this.questionRepository.delete({});
   }
 
   return;

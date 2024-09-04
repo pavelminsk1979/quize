@@ -29,7 +29,18 @@ export class GameRepository {
            raw: [ { id: 3 } ]
        }*/
 
-    return String(result.identifiers[0].id);
+    return String(result.identifiers[0].idGame);
+  }
+
+  async getGameById(gameId: string) {
+    const result = await this.gameRepository
+      .createQueryBuilder('g')
+      .where('g.idGame = :gameId', { gameId })
+      .getOne();
+
+    if (!result) return null;
+
+    return result;
   }
 
   /*  async findRowPanding() {

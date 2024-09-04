@@ -2,8 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { ConnectionRepository } from '../repositories/connection-repository';
 import { ConnectionTabl } from '../domains/connection.entity';
 import { GameRepository } from '../repositories/game-repository';
-import { Connection, CreateGame } from '../api/types/dto';
+import { Connection, CreateGame, Random } from '../api/types/dto';
 import { QuestionRepository } from '../../u-questions/repositories/question-repository';
+import { UserSqlTypeormRepository } from '../../users/repositories/user-sql-typeorm-repository';
+import { Question } from '../../u-questions/domains/question.entity';
+import { RandomQuestionRepository } from '../repositories/random-question-repository';
 
 @Injectable()
 export class GameService {
@@ -11,9 +14,19 @@ export class GameService {
     protected connectionRepository: ConnectionRepository,
     protected gameRepository: GameRepository,
     protected questionRepository: QuestionRepository,
+    protected userSqlTypeormRepository: UserSqlTypeormRepository,
+    protected randomQuestionRepository: RandomQuestionRepository,
   ) {}
 
   async startGame(userId: string) {
+    /*есть ли такой ЮЗЕР и дальше по коду 
+    понадобится запись-юзер  чтоб  связь 
+    между таблицами сделать*/
+
+    const user = await this.userSqlTypeormRepository.getUserById(userId);
+
+    if (!user) return null;
+
     /* есть ли в таблице ConnectionTabl  запись
      со статусом   status:panding*/
 
@@ -32,6 +45,13 @@ export class GameService {
       };
       const gameId: string = await this.gameRepository.createGame(newGame);
 
+      /*надо получить запись-game чтобы создать связь
+      между таблицами ConnectionTabl и Game*/
+
+      const game = await this.gameRepository.getGameById(gameId);
+
+      if (!game) return null;
+
       /*создаю запись
       в таблице ConnectionTabl  с status:panding*/
       const newConnectionTabl: Connection = {
@@ -39,6 +59,8 @@ export class GameService {
         status: 'panding',
         idGameFK: gameId,
         idUserFK: userId,
+        usertyp: user,
+        game: game,
       };
 
       const connectionId: string =
@@ -50,6 +72,27 @@ export class GameService {
        и в каждой записи одинаковые  gameId */
       const arrayRandomQuestions =
         await this.questionRepository.getRandomQuestions();
+
+      const randRow: Question = arrayRandomQuestions[0];
+
+      const question = await this.questionRepository.getQuestionById(
+        String(randRow.id),
+      );
+
+      if (!question) return null;
+
+      const newRandom: Random = {
+        createdAt: new Date().toISOString(),
+        idGameFK: gameId,
+        idQuestionFK: String(randRow.id),
+        game: game,
+        question: question,
+      };
+
+      const randomQusetionRowId =
+        await this.randomQuestionRepository.createRandomRow(newRandom);
+      console.log(randomQusetionRowId);
+      return randomQusetionRowId;
     }
 
     /*  а если один игрок уже ожидал - тогда 

@@ -27,7 +27,7 @@ export class GameController {
     const dataForGame = await this.gameService.startGame(userId);
 
     if (dataForGame) {
-      return { id: dataForGame };
+      return dataForGame;
     } else {
       /*вернут 403 если юзер текущий ожидает второго игрока*/
       throw new ForbiddenException(
