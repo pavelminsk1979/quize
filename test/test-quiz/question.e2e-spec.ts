@@ -40,80 +40,82 @@ describe('tests for andpoint users', () => {
     await app.close();
   });
 
-  it('create question1', async () => {
-    const res = await request(app.getHttpServer())
-      .post('/sa/quiz/questions')
-      .set('Authorization', `Basic ${loginPasswordBasic64}`)
-      .send({
-        body: '2+1? Ответ словом или числом',
-        correctAnswers: ['3', 'three', 'три'],
-      })
-      .expect(201);
-
-    //console.log(res.body);
-
-    questionId = res.body.id;
-  });
-
-  it('update  question1', async () => {
-    const inCorrectId = '602afe92-7d97-4395-b1b9-6cf98b351bbe';
-    await request(app.getHttpServer())
-      .put(`/sa/quiz/questions/${inCorrectId}`)
-      .set('Authorization', `Basic ${loginPasswordBasic64}`)
-      .send({
-        body: 'update 2+2? Ответ словом или числом',
-        correctAnswers: ['up-4, up-four, up-четыре'],
-      })
-      .expect(404);
-  });
-
-  it('delete  question1 by id', async () => {
-    const inCorrectId = '602afe92-7d97-4395-b1b9-6cf98b351bbe';
-    await request(app.getHttpServer())
-      .delete(`/sa/quiz/questions/${inCorrectId}`)
-      .set('Authorization', `Basic ${loginPasswordBasic64}`)
-
-      .expect(404);
-  });
-
-  /*  it('create question2', async () => {
+  /*
+    it('create question1', async () => {
       const res = await request(app.getHttpServer())
         .post('/sa/quiz/questions')
         .set('Authorization', `Basic ${loginPasswordBasic64}`)
         .send({
-          body: '2+3? Ответ словом или числом',
-          correctAnswers: ['5', 'five', 'пять'],
+          body: '2+1? Ответ словом или числом',
+          correctAnswers: ['3', 'three', 'три'],
         })
         .expect(201);
   
-      questionId2 = res.body.id;
-  
       //console.log(res.body);
-    });
   
-    it('update  Status Publish For Question2', async () => {
-      const res = await request(app.getHttpServer())
-        .put(`/sa/quiz/questions/${questionId2}/publish`)
+      questionId = res.body.id;
+    });
+  */
+
+  /*  it('update  question1', async () => {
+      const inCorrectId = '602afe92-7d97-4395-b1b9-6cf98b351bbe';
+      await request(app.getHttpServer())
+        .put(`/sa/quiz/questions/${inCorrectId}`)
         .set('Authorization', `Basic ${loginPasswordBasic64}`)
         .send({
-          published: true,
+          body: 'update 2+2? Ответ словом или числом',
+          correctAnswers: ['up-4, up-four, up-четыре'],
         })
-        .expect(204);
-      console.log('put');
-      console.log(res.body);
-      console.log('put');
-    });
-  
-    it('get questions + pagination', async () => {
-      const res = await request(app.getHttpServer())
-        .get('/sa/quiz/questions')
-        .set('Authorization', `Basic ${loginPasswordBasic64}`)
-  
-        .expect(200);
-      console.log('@@@@@@@@@@@@@@@@@@@@@@@@');
-      console.log(res.body);
-      console.log('@@@@@@@@@@@@@@@@@@@@@@@@');
+        .expect(404);
     });*/
+
+  /* it('delete  question1 by id', async () => {
+     const inCorrectId = '602afe92-7d97-4395-b1b9-6cf98b351bbe';
+     await request(app.getHttpServer())
+       .delete(`/sa/quiz/questions/${inCorrectId}`)
+       .set('Authorization', `Basic ${loginPasswordBasic64}`)
+ 
+       .expect(404);
+   });*/
+
+  it('create question2', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/sa/quiz/questions')
+      .set('Authorization', `Basic ${loginPasswordBasic64}`)
+      .send({
+        body: '2+3? Ответ словом или числом',
+        correctAnswers: ['5', 'five', 'пять'],
+      })
+      .expect(201);
+
+    questionId2 = res.body.id;
+
+    //console.log(res.body);
+  });
+
+  it('update  Status Publish For Question2', async () => {
+    const res = await request(app.getHttpServer())
+      .put(`/sa/quiz/questions/${questionId2}/publish`)
+      .set('Authorization', `Basic ${loginPasswordBasic64}`)
+      .send({
+        published: true,
+      })
+      .expect(204);
+    console.log('put');
+    console.log(res.body);
+    console.log('put');
+  });
+
+  it('get questions + pagination', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/sa/quiz/questions')
+      .set('Authorization', `Basic ${loginPasswordBasic64}`)
+
+      .expect(200);
+    console.log('@@@@@@@@@@@@@@@@@@@@@@@@');
+    console.log(res.body);
+    console.log('@@@@@@@@@@@@@@@@@@@@@@@@');
+  });
 
   /*  it('create question3', async () => {
       const res = await request(app.getHttpServer())
