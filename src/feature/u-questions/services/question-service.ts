@@ -31,6 +31,8 @@ export class QuestionService {
   ) {
     const { body, correctAnswers } = questionInputModel;
 
+    if (questionId.length > 5) return false;
+
     const isExistQuestion =
       await this.questionRepository.isExistQuestion(questionId);
 
@@ -51,6 +53,13 @@ export class QuestionService {
   }
 
   async deleteQestionById(questionId: string) {
+    if (questionId.length > 5) return false;
+
+    const isExistQuestion =
+      await this.questionRepository.getQuestionById(questionId);
+
+    if (!isExistQuestion) return false;
+
     return this.questionRepository.deleteQestionById(questionId);
   }
 
@@ -58,6 +67,8 @@ export class QuestionService {
     questionId: string,
     statusPublishForQuestionInputModel: StatusPublishInputModel,
   ) {
+    if (questionId.length > 5) return false;
+
     const isExistQuestion =
       await this.questionRepository.isExistQuestion(questionId);
 

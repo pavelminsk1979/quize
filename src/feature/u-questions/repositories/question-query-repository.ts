@@ -201,10 +201,14 @@ pagesCount это число
   }
 
   createViewModelOneQuestion(result: Question): ViewModelOneQuestion {
+    /* надо массив но внутри не много строк
+     а одна строка и в ней все варианты 
+     ответов */
+    const arrOneString = result.correctAnswers.join(',');
     return {
       id: String(result.id),
       body: result.body,
-      correctAnswers: result.correctAnswers,
+      correctAnswers: [arrOneString],
       createdAt: result.createdAt,
       updatedAt: result.updatedAt,
       published: result.published,
