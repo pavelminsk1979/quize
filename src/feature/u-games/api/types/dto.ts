@@ -49,8 +49,18 @@ export enum GameStatus {
 export type RequestFirstPlayer = {
   id: 'string'; //айдишка игры
   firstPlayerProgress: FirstPlayerProgress;
+  secondPlayerProgress: FirstPlayerProgress;
+  questions: DataQuestion[];
+  status: GameStatus;
+  pairCreatedDate: string; //когда создан первый игрок
+};
+
+export type RequestFirstPlusSecondPlayer = {
+  id: 'string'; //айдишка игры
+  firstPlayerProgress: FirstPlayerProgress;
   secondPlayerProgress: null;
   questions: DataQuestion[];
   status: GameStatus;
   pairCreatedDate: string; //когда создан первый игрок
+  startGameDate: string;
 };

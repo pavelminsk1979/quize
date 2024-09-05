@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InsertResult, Repository } from 'typeorm';
 import { ConnectionTabl } from '../domains/connection.entity';
-import { Connection } from '../api/types/dto';
+import { Connection, GameStatus } from '../api/types/dto';
 
 @Injectable()
 export class ConnectionRepository {
@@ -14,7 +14,7 @@ export class ConnectionRepository {
   async findRowPanding() {
     const result = await this.connectionRepository
       .createQueryBuilder('c')
-      .where('c.status = :status', { status: 'panding' })
+      .where('c.status = :status', { status: GameStatus.PANDING })
       .getOne();
 
     /* запрос  будет возвращать либо 
@@ -46,6 +46,23 @@ export class ConnectionRepository {
        }*/
 
     return String(result.identifiers[0].id);
+  }
+
+  async changePandingToActive(idConnection: string) {
+    const result = await this.connectionRepository
+      .createQueryBuilder()
+      .update(ConnectionTabl)
+      .set({ status: GameStatus.ACTIVE })
+      .where('idConnection=:idConnection', { idConnection })
+      .execute();
+
+    /* result это вот такая структура
+   UpdateResult { generatedMaps: [], raw: [], affected: 0 }
+    affected-- это количество измененных саписей
+  */
+
+    if (result.affected === 0) return false;
+    return true;
   }
 
   /*  async createNewQuestion(newQuestion: CreateQuestion) {

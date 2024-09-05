@@ -20,6 +20,11 @@ describe('tests for andpoint users', () => {
   const email1 = 'avelminsk400@mail.ru';
 
   let accessToken1;
+  let accessToken2;
+
+  const login2 = 'login22';
+  const password2 = 'passwor22';
+  const email2 = 'avelminsk22@mail.ru';
 
   const loginPasswordBasic64 = 'YWRtaW46cXdlcnR5';
 
@@ -44,7 +49,7 @@ describe('tests for andpoint users', () => {
     await app.close();
   });
 
-  it('create user', async () => {
+  it('create user1', async () => {
     const res = await request(app.getHttpServer())
       .post('/sa/users')
       .set('Authorization', `Basic ${loginPasswordBasic64}`)
@@ -70,6 +75,35 @@ describe('tests for andpoint users', () => {
       .expect(200);
 
     accessToken1 = res.body.accessToken;
+    //console.log(accessToken1);
+  });
+
+  it('create user2', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/sa/users')
+      .set('Authorization', `Basic ${loginPasswordBasic64}`)
+      .send({
+        login: login2,
+        password: password2,
+        email: email2,
+      })
+      .expect(201);
+
+    //userId = res.body.id;
+
+    //console.log(res.body);
+  });
+
+  it('login  user2', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({
+        loginOrEmail: login2,
+        password: password2,
+      })
+      .expect(200);
+
+    accessToken2 = res.body.accessToken;
     //console.log(accessToken1);
   });
 
@@ -261,6 +295,21 @@ describe('tests for andpoint users', () => {
     const res = await request(app.getHttpServer())
       .post('/pair-game-quiz/pairs/connection')
       .set('Authorization', `Bearer ${accessToken1}`)
+      .expect(200);
+    console.log(res.body);
+  });
+
+  it('start game, one more time, first player for error 403', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/connection')
+      .set('Authorization', `Bearer ${accessToken1}`)
+      .expect(403);
+  });
+
+  it('start game second player', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/connection')
+      .set('Authorization', `Bearer ${accessToken2}`)
       .expect(200);
     console.log(res.body);
   });
