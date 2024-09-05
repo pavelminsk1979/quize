@@ -15,7 +15,7 @@ export class QuestionService {
       body,
       correctAnswers,
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      updatedAt: null,
       published: false,
     };
 

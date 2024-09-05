@@ -18,8 +18,8 @@ export class Question {
   @Column()
   public createdAt: string;
 
-  @Column()
-  public updatedAt: string;
+  @Column({ type: 'text', nullable: true })
+  public updatedAt: string | null;
 
   @Column()
   public published: boolean;

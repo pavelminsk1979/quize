@@ -3,6 +3,6 @@ export type ViewModelOneQuestion = {
   body: string;
   correctAnswers: string[];
   createdAt: string;
-  updatedAt: string;
+  updatedAt: string | null;
   published: boolean;
 };

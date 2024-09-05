@@ -116,8 +116,9 @@ describe('tests for andpoint users', () => {
         correctAnswers: ['4', 'four', 'четыре'],
       })
       .expect(201);
-
-    //console.log(res.body);
+    console.log('###########################');
+    console.log(res.body);
+    console.log('###########################');
 
     //questionId = res.body.id;
   });
