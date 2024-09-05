@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  ServiceUnavailableException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConnectionRepository } from '../repositories/connection-repository';
 import { ConnectionTabl } from '../domains/connection.entity';
 import { GameRepository } from '../repositories/game-repository';
@@ -25,7 +29,19 @@ export class GameService {
 
     const user = await this.userSqlTypeormRepository.getUserById(userId);
 
-    if (!user) return null;
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    /* есть ли в таблице ConnectionTabl  запись
+  c пришедшей userId и  со
+  статусом   status:active  --   тобишь этот пользователь
+  играет в данный момент */
+
+    const isExistPlayerWithStatusActive =
+      await this.connectionRepository.findRowActiveByUserId(userId);
+
+    if (isExistPlayerWithStatusActive) return null;
 
     /* есть ли в таблице ConnectionTabl  запись
      со статусом   status:panding*/
@@ -50,7 +66,11 @@ export class GameService {
 
       const game = await this.gameRepository.getGameById(gameId);
 
-      if (!game) return null;
+      if (!game) {
+        /*503 Service Unavailable
+        сервер временно недоступен или перегружен*/
+        throw new ServiceUnavailableException();
+      }
 
       //дата создания новой пары
       const pairCreatedDate = new Date().toISOString();
@@ -85,7 +105,11 @@ export class GameService {
           String(el.id),
         );
 
-        if (!question) return null;
+        if (!question) {
+          /*503 Service Unavailable
+          сервер временно недоступен или перегружен*/
+          throw new ServiceUnavailableException();
+        }
 
         /*созданый обьект - это одна запись в таблицу RandomQuestion
                 и будет 5 таких записей и у каждой записи будут
@@ -170,7 +194,11 @@ export class GameService {
       rowConnectionTabl.idGameFK,
     );
 
-    if (!game) return null;
+    if (!game) {
+      /*503 Service Unavailable
+      сервер временно недоступен или перегружен*/
+      throw new ServiceUnavailableException();
+    }
 
     const startGameDate = new Date().toISOString();
 
@@ -203,11 +231,11 @@ export class GameService {
       rowConnectionTabl.idUserFK,
     );
 
-    if (!player1) return null;
-
-    console.log('kkkkkkkkkkkkkkkkkkk');
-    console.log(player1);
-    console.log('kkkkkkkkkkkkkkkkkkk');
+    if (!player1) {
+      /*503 Service Unavailable
+      сервер временно недоступен или перегружен*/
+      throw new ServiceUnavailableException();
+    }
 
     /* вопросы надо взять из таблицы однообразно
   - тобишь имея АЙДИшкуИГРЫ возму вопросы
@@ -260,66 +288,3 @@ export class GameService {
       для двух игроков */
   }
 }
-
-/*  async createQuestion(questionInputModel: QuestionInputModel) {
-    const { body, correctAnswers } = questionInputModel;
-
-    const newQuestion: CreateQuestion = {
-      body,
-      correctAnswers,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      published: false,
-    };
-
-    const result: string =
-      await this.questionRepository.createNewQuestion(newQuestion);
-
-    return result;
-  }*/
-
-/*  async updateQuestion(
-    questionId: string,
-    questionInputModel: QuestionInputModel,
-  ) {
-    const { body, correctAnswers } = questionInputModel;
-
-    const isExistQuestion =
-      await this.questionRepository.isExistQuestion(questionId);
-
-    if (!isExistQuestion) return false;
-
-    const newUpdatedAt = new Date().toISOString();
-
-    const newBody = body;
-
-    const newCorrectAnswers = correctAnswers;
-
-    return this.questionRepository.updateQuestion(
-      questionId,
-      newUpdatedAt,
-      newBody,
-      newCorrectAnswers,
-    );
-  }*/
-
-/*  async deleteQestionById(questionId: string) {
-    return this.questionRepository.deleteQestionById(questionId);
-  }*/
-
-/*  async updateStatusPublishForQuestion(
-    questionId: string,
-    statusPublishForQuestionInputModel: StatusPublishInputModel,
-  ) {
-    const isExistQuestion =
-      await this.questionRepository.isExistQuestion(questionId);
-
-    if (!isExistQuestion) return false;
-
-    const newPublished = statusPublishForQuestionInputModel.published;
-
-    return this.questionRepository.updateStatusPublishForQuestion(
-      questionId,
-      newPublished,
-    );
-  }*/

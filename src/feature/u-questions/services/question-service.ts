@@ -76,9 +76,12 @@ export class QuestionService {
 
     const newPublished = statusPublishForQuestionInputModel.published;
 
+    const newUpdatedAt = new Date().toISOString();
+
     return this.questionRepository.updateStatusPublishForQuestion(
       questionId,
       newPublished,
+      newUpdatedAt,
     );
   }
 }

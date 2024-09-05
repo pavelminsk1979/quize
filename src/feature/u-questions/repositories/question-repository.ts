@@ -121,12 +121,14 @@ export class QuestionRepository {
   async updateStatusPublishForQuestion(
     questionId: string,
     newPublished: boolean,
+    newUpdatedAt: string,
   ) {
     const result = await this.questionRepository
       .createQueryBuilder()
       .update(Question)
       .set({
         published: newPublished,
+        updatedAt: newUpdatedAt,
       })
       .where('id=:questionId', { questionId })
       .execute();
