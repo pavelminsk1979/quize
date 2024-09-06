@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   ForbiddenException,
   HttpCode,
@@ -10,6 +11,7 @@ import {
 import { AuthTokenGuard } from '../../../common/guard/auth-token-guard';
 import { Request } from 'express';
 import { GameService } from '../services/game-service';
+import { AnswerInputModel } from './pipes/answer-input-model';
 
 @Controller('pair-game-quiz/pairs')
 export class GameController {
@@ -39,13 +41,18 @@ export class GameController {
   @UseGuards(AuthTokenGuard)
   @HttpCode(HttpStatus.OK)
   @Post('my-current/answers')
-  async setAnswer(@Req() request: Request) {
+  async setAnswer(
+    @Body() answerInputModel: AnswerInputModel,
+    @Req() request: Request,
+  ) {
     // когда AccessToken проверяю в AuthTokenGuard - тогда
     // из него достаю userId и помещаю ее в request
 
     const userId = request['userId'];
 
-    const dataAnswer = await this.gameService.setAnswer(userId);
+    const { answer } = answerInputModel;
+
+    const dataAnswer = await this.gameService.setAnswer(userId, answer);
 
     if (dataAnswer) {
       return dataAnswer;

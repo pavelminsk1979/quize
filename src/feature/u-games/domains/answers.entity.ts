@@ -1,4 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { AnswerStatus } from '../api/types/dto';
 
 @Entity()
 /*не создает таблицы без
@@ -22,4 +23,7 @@ export class Answers {
 
   @Column()
   public answer: string;
+
+  @Column()
+  public answerStatus: AnswerStatus;
 }

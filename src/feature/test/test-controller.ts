@@ -13,6 +13,7 @@ import { Question } from '../u-questions/domains/question.entity';
 import { ConnectionTabl } from '../u-games/domains/connection.entity';
 import { RandomQuestion } from '../u-games/domains/random-question.entity';
 import { Game } from '../u-games/domains/game.entity';
+import { Answers } from '../u-games/domains/answers.entity';
 
 @Controller('testing')
 export class TestController {
@@ -39,6 +40,8 @@ export class TestController {
     private readonly randomQuestionRepository: Repository<RandomQuestion>,
     @InjectRepository(Game)
     private readonly gameRepository: Repository<Game>,
+    @InjectRepository(Answers)
+    private readonly answersRepository: Repository<Answers>,
   ) {}
 
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -55,6 +58,7 @@ export class TestController {
     await this.usertypRepository.delete({});
     await this.posttypRepository.delete({});
     await this.blogtypRepository.delete({});
+    await this.answersRepository.delete({});
   }
 
   return;

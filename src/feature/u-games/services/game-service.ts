@@ -6,7 +6,14 @@ import {
 import { ConnectionRepository } from '../repositories/connection-repository';
 import { ConnectionTabl } from '../domains/connection.entity';
 import { GameRepository } from '../repositories/game-repository';
-import { Connection, CreateGame, GameStatus, Random } from '../api/types/dto';
+import {
+  AnswerStatus,
+  Connection,
+  CreateAnswer,
+  CreateGame,
+  GameStatus,
+  Random,
+} from '../api/types/dto';
 import { QuestionRepository } from '../../u-questions/repositories/question-repository';
 import { UserSqlTypeormRepository } from '../../users/repositories/user-sql-typeorm-repository';
 import { Question } from '../../u-questions/domains/question.entity';
@@ -24,7 +31,7 @@ export class GameService {
     protected answerRepository: AnswerRepository,
   ) {}
 
-  async setAnswer(userId: string) {
+  async setAnswer(userId: string, answer: string) {
     /*  у таблицы ConnectionTabl поискать по userId - есть ли
       запись с статусом АКТИВ--- у записи будет  АЙДИШКА игры 
       и в этойже таблице по АЙДИШКЕИГРЫ найдется второй плэйер
@@ -65,6 +72,10 @@ export class GameService {
     const questionFive =
       await this.randomQuestionRepository.getQuestionsForGame(idGame);
 
+    console.log('questionFivequestionFivequestionFivequestionFive');
+    console.log(questionFive);
+    console.log('questionFivequestionFivequestionFivequestionFive');
+
     /*  из пяти мне надо ОДИН и в той позиции(1 или 3 или 4)
     в которой у таблицы ANSWERS уже есть ответы ПЛЮС ОДИН
     (например уже одна запись есть значит на ПЕРВЫЙ ВОПРОС
@@ -73,15 +84,37 @@ export class GameService {
 
     const necessaryQuestion = questionFive[amountAnswersFromCurrentUser];
 
-    console.log('asnwer');
-    console.log(necessaryQuestion);
-    console.log('asnwer');
-
     /* necessaryQuestion - это нужная запись и в ней 
      и вопрос и ответ и я буду с этой записью сравнивать
      тот ответ что на ЭНДПОИНТ ПРИШОЛ ОТ ИГРАЮЩЕГО
      ЮЗЕРА*/
-    isCorrectAnswer;
+
+    const findResult = necessaryQuestion.question.correctAnswers.find(
+      (el) => el === answer,
+    );
+
+    console.log('!!!!!!!!!!!!!!!!!!!!!');
+    console.log(necessaryQuestion);
+    console.log('!!!!!!!!!!!!!!!!!!!!!');
+
+    let answerStatus;
+    if (findResult) {
+      answerStatus = AnswerStatus.CORRECT;
+    } else {
+      answerStatus = AnswerStatus.INCORRECT;
+    }
+
+    /*делаю  запись в таблицу ANSWER*/
+
+    /*   const newAnswer: CreateAnswer = {
+         createdAt: new Date().toISOString(),
+         answer,
+         idUser: userId,
+         idGame: idGame,
+         answerStatus
+         idQuestion
+       };*/
+    return { obj: answerStatus };
   }
 
   ///////////////////////////////////////////////////////////////

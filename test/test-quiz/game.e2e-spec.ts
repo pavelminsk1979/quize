@@ -3,10 +3,12 @@ import { AppModule } from '../../src/app.module';
 import { applyAppSettings } from '../../src/settings/apply-app-settings';
 import request from 'supertest';
 import cookieParser from 'cookie-parser';
+import { DataSource } from 'typeorm';
 
 describe('tests for andpoint users', () => {
   let app;
 
+  let questionId1;
   let questionId2;
   let questionId3;
   let questionId4;
@@ -27,6 +29,8 @@ describe('tests for andpoint users', () => {
   const email2 = 'avelminsk22@mail.ru';
 
   const loginPasswordBasic64 = 'YWRtaW46cXdlcnR5';
+
+  let answer1;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -104,7 +108,7 @@ describe('tests for andpoint users', () => {
       .expect(200);
 
     accessToken2 = res.body.accessToken;
-    //console.log(accessToken1);
+    //console.log(accessToken2);
   });
 
   it('create question1', async () => {
@@ -120,7 +124,7 @@ describe('tests for andpoint users', () => {
        console.log(res.body);
        console.log('###########################');*/
 
-    //questionId = res.body.id;
+    questionId1 = res.body.id;
   });
 
   it('create question2', async () => {
@@ -193,8 +197,8 @@ describe('tests for andpoint users', () => {
       .post('/sa/quiz/questions')
       .set('Authorization', `Basic ${loginPasswordBasic64}`)
       .send({
-        body: '2+8? Ответ словом или числом',
-        correctAnswers: ['10', 'ten', 'десять'],
+        body: '1+1? Ответ словом или числом',
+        correctAnswers: ['2', 'two', 'два'],
       })
       .expect(201);
     questionId7 = res.body.id;
@@ -205,8 +209,8 @@ describe('tests for andpoint users', () => {
       .post('/sa/quiz/questions')
       .set('Authorization', `Basic ${loginPasswordBasic64}`)
       .send({
-        body: '2+9? Ответ словом или числом',
-        correctAnswers: ['11', 'eleven', 'одинадцать'],
+        body: '1+2? Ответ словом или числом',
+        correctAnswers: ['3', 'three', 'три'],
       })
       .expect(201);
     questionId8 = res.body.id;
@@ -218,9 +222,23 @@ describe('tests for andpoint users', () => {
       .set('Authorization', `Basic ${loginPasswordBasic64}`)
 
       .expect(200);
-    /*  console.log('@@@@@@@@@@@@@@@@@@@@@@@@');
-      console.log(res.body);
-      console.log('@@@@@@@@@@@@@@@@@@@@@@@@');*/
+    /*   console.log('@@@@@@@@@@@@@@@@@@@@@@@@');
+       console.log(res.body.items[0].correctAnswers[0]);
+       console.log('@@@@@@@@@@@@@@@@@@@@@@@@');
+       answer1 = res.body.items[0].correctAnswers[0].slice(0, 2);
+       console.log('-------------------------------------');
+       console.log(answer1);
+       console.log('-------------------------------------');*/
+  });
+
+  it('update  Status Publish For Question1', async () => {
+    await request(app.getHttpServer())
+      .put(`/sa/quiz/questions/${questionId1}/publish`)
+      .set('Authorization', `Basic ${loginPasswordBasic64}`)
+      .send({
+        published: true,
+      })
+      .expect(204);
   });
 
   it('update  Status Publish For Question2', async () => {
@@ -297,7 +315,7 @@ describe('tests for andpoint users', () => {
       .post('/pair-game-quiz/pairs/connection')
       .set('Authorization', `Bearer ${accessToken1}`)
       .expect(200);
-    console.log(res.body);
+    //console.log(res.body);
   });
 
   it('start game, one more time, first player for error 403', async () => {
@@ -312,46 +330,42 @@ describe('tests for andpoint users', () => {
       .post('/pair-game-quiz/pairs/connection')
       .set('Authorization', `Bearer ${accessToken2}`)
       .expect(200);
-    console.log(res.body);
+    //console.log(res.body);
+
+    /* console.log('@@@@@@@@@@@@@@@@@@@@@@@@');
+     console.log(res.body.questions[0].id);
+     console.log('@@@@@@@@@@@@@@@@@@@@@@@@');*/
+    const idQuestion = res.body.questions[0].id;
+
+    const dataSource = await app.resolve(DataSource);
+    const result = await dataSource.query(
+      `
+    select *
+    from public."question" q
+    where q.id = $1
+    `,
+      [idQuestion],
+    );
+
+    answer1 = result[0].correctAnswers.slice(0, 1);
+    /* console.log('-------------------------------------');
+     console.log(result[0].correctAnswers.slice(0, 1));
+     console.log('-------------------------------------');*/
   });
 
-  /* it('create user', async () => {
-     const res = await request(app.getHttpServer())
-       .post('/sa/users')
-       .set('Authorization', `Basic ${loginPasswordBasic64}`)
-       .send({
-         login: login2,
-         password: password2,
-         email: email2,
-       })
-       .expect(201);
- 
-     //userId = res.body.id;
-   });*/
+  /////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////
+  //'my-current/answers'
+  ///////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////
 
-  /*  it('delete  user by id', async () => {
-      await request(app.getHttpServer())
-        .delete(`/sa/users/${userId}`)
-        .set('Authorization', `Basic ${loginPasswordBasic64}`)
-  
-        .expect(204);
-    });*/
-
-  /*  it('get users', async () => {
-      const res = await request(app.getHttpServer())
-        .get('/sa/users')
-        .set('Authorization', `Basic ${loginPasswordBasic64}`)
-  
-        .expect(200);
-      console.log(res.body);
-    });*/
-
-  /*  it('delete  user by id', async () => {
-      const id = '602afe92-7d97-4395-b1b9-6cf98b351bbe';
-      await request(app.getHttpServer())
-        .delete(`/sa/users/${id}`)
-        .set('Authorization', `Basic ${loginPasswordBasic64}`)
-  
-        .expect(404);
-    });*/
+  it('set answer', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken1}`)
+      .send({ answer: answer1 })
+      .expect(200);
+    console.log(res.body);
+  });
 });

@@ -46,6 +46,12 @@ export enum GameStatus {
   FINISHED = 'Finished ',
 }
 
+export enum AnswerStatus {
+  CORRECT = 'Correct',
+
+  INCORRECT = 'Incorrect ',
+}
+
 export type RequestFirstPlayer = {
   id: 'string'; //айдишка игры
   firstPlayerProgress: FirstPlayerProgress;
@@ -63,4 +69,13 @@ export type RequestFirstPlusSecondPlayer = {
   status: GameStatus;
   pairCreatedDate: string; //когда создан первый игрок
   startGameDate: string;
+};
+
+export type CreateAnswer = {
+  createdAt: string;
+  idGame: string;
+  idUser: string;
+  idQuestion: string;
+  answer: string;
+  answerStatus: AnswerStatus;
 };
