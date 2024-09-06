@@ -332,9 +332,9 @@ describe('tests for andpoint users', () => {
       .expect(200);
     //console.log(res.body);
 
-    /* console.log('@@@@@@@@@@@@@@@@@@@@@@@@');
-     console.log(res.body.questions[0].id);
-     console.log('@@@@@@@@@@@@@@@@@@@@@@@@');*/
+    /*   console.log('@@@@@@@@@@@@@@@@@@@@@@@@');
+    console.log(res.body);
+    console.log('@@@@@@@@@@@@@@@@@@@@@@@@');*/
     const idQuestion = res.body.questions[0].id;
 
     const dataSource = await app.resolve(DataSource);

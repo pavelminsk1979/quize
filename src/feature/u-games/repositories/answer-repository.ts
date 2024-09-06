@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InsertResult, Repository } from 'typeorm';
 import { ConnectionTabl } from '../domains/connection.entity';
-import { Connection, GameStatus } from '../api/types/dto';
+import { Connection, CreateAnswer, GameStatus } from '../api/types/dto';
 import { Answers } from '../domains/answers.entity';
 
 @Injectable()
@@ -11,6 +11,30 @@ export class AnswerRepository {
     @InjectRepository(Answers)
     private readonly answersRepository: Repository<Answers>,
   ) {}
+
+  async createAnswer(newAnswer: CreateAnswer) {
+    const result: InsertResult = await this.answersRepository
+      .createQueryBuilder()
+      .insert()
+      .into(Answers)
+      .values({
+        createdAt: newAnswer.createdAt,
+        answer: newAnswer.answer,
+        idGame: newAnswer.idGame,
+        answerStatus: newAnswer.answerStatus,
+        idQuestion: newAnswer.idQuestion,
+        idUser: newAnswer.idUser,
+      })
+      .execute();
+    /*тут структура
+    InsertResult {
+      identifiers: [ { id: 3 } ],
+        generatedMaps: [ { id: 3 } ],
+        raw: [ { id: 3 } ]
+    }*/
+
+    return String(result.identifiers[0].id);
+  }
 
   async amountAnswersFromCurrentUser(userId: string, idGame: string) {
     const result = await this.answersRepository

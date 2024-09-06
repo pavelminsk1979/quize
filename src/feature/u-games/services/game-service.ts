@@ -19,6 +19,7 @@ import { UserSqlTypeormRepository } from '../../users/repositories/user-sql-type
 import { Question } from '../../u-questions/domains/question.entity';
 import { RandomQuestionRepository } from '../repositories/random-question-repository';
 import { AnswerRepository } from '../repositories/answer-repository';
+import { Answers } from '../domains/answers.entity';
 
 @Injectable()
 export class GameService {
@@ -72,9 +73,9 @@ export class GameService {
     const questionFive =
       await this.randomQuestionRepository.getQuestionsForGame(idGame);
 
-    console.log('questionFivequestionFivequestionFivequestionFive');
-    console.log(questionFive);
-    console.log('questionFivequestionFivequestionFivequestionFive');
+    /* console.log('questionFivequestionFivequestionFivequestionFive');
+     console.log(questionFive);
+     console.log('questionFivequestionFivequestionFivequestionFive');*/
 
     /*  из пяти мне надо ОДИН и в той позиции(1 или 3 или 4)
     в которой у таблицы ANSWERS уже есть ответы ПЛЮС ОДИН
@@ -93,9 +94,9 @@ export class GameService {
       (el) => el === answer,
     );
 
-    console.log('!!!!!!!!!!!!!!!!!!!!!');
-    console.log(necessaryQuestion);
-    console.log('!!!!!!!!!!!!!!!!!!!!!');
+    /*  console.log('!!!!!!!!!!!!!!!!!!!!!');
+      console.log(necessaryQuestion);
+      console.log('!!!!!!!!!!!!!!!!!!!!!');*/
 
     let answerStatus;
     if (findResult) {
@@ -104,17 +105,29 @@ export class GameService {
       answerStatus = AnswerStatus.INCORRECT;
     }
 
+    const addedAt = new Date().toISOString();
+
     /*делаю  запись в таблицу ANSWER*/
 
-    /*   const newAnswer: CreateAnswer = {
-         createdAt: new Date().toISOString(),
-         answer,
-         idUser: userId,
-         idGame: idGame,
-         answerStatus
-         idQuestion
-       };*/
-    return { obj: answerStatus };
+    const newAnswer: CreateAnswer = {
+      createdAt: addedAt,
+      answer,
+      idUser: userId,
+      idGame,
+      answerStatus,
+      idQuestion: necessaryQuestion.idQuestionFK,
+    };
+
+    //запись в таблицу Answers
+    await this.answerRepository.createAnswer(newAnswer);
+
+    //на фронт возвращаю viewModel
+
+    return {
+      questionId: necessaryQuestion.idQuestionFK,
+      answerStatus,
+      addedAt,
+    };
   }
 
   ///////////////////////////////////////////////////////////////
