@@ -11,6 +11,7 @@ import { QuestionRepository } from '../../u-questions/repositories/question-repo
 import { UserSqlTypeormRepository } from '../../users/repositories/user-sql-typeorm-repository';
 import { Question } from '../../u-questions/domains/question.entity';
 import { RandomQuestionRepository } from '../repositories/random-question-repository';
+import { AnswerRepository } from '../repositories/answer-repository';
 
 @Injectable()
 export class GameService {
@@ -20,8 +21,74 @@ export class GameService {
     protected questionRepository: QuestionRepository,
     protected userSqlTypeormRepository: UserSqlTypeormRepository,
     protected randomQuestionRepository: RandomQuestionRepository,
+    protected answerRepository: AnswerRepository,
   ) {}
 
+  async setAnswer(userId: string) {
+    /*  у таблицы ConnectionTabl поискать по userId - есть ли
+      запись с статусом АКТИВ--- у записи будет  АЙДИШКА игры 
+      и в этойже таблице по АЙДИШКЕИГРЫ найдется второй плэйер
+      ---для одной игры два плэйера в этой таблице со статусом 
+      АКТИВ оба будут */
+
+    const userActive =
+      await this.connectionRepository.findRowActiveByUserId(userId);
+
+    //если нет- 403 ошибка
+
+    if (!userActive) return null;
+
+    //айдишка игры
+    const idGame = userActive.idGameFK;
+
+    const amountAnswersFromCurrentUser =
+      await this.answerRepository.amountAnswersFromCurrentUser(userId, idGame);
+    /*  если в таблице  ANSWERS  для данной
+   userId  и  idGame имеются 5 и более записей
+   тогда на все вопросы уже ответил ЮЗЕР и надо
+   вернуть  403
+   */
+
+    if (amountAnswersFromCurrentUser >= 5) return null;
+
+    /* если меньше 5-ти записей тогда в 
+     таблицу  ANSWERS  добавлю запись 
+     но вначале проверю- правильный ли ответ дал ЮЗЕР*/
+
+    /*   надо найти вопрос--- вопросы выданы в определенном порядке и ответы приходят в томже порядке  -- порядок в
+       таблице RandomQuestion  а  вопросы и ответы 
+       в таблице Qustion*/
+
+    /*  вопросы в определенном порядке получаю из
+      таблицы RandomQuestion  по idGameFK*/
+
+    const questionFive =
+      await this.randomQuestionRepository.getQuestionsForGame(idGame);
+
+    /*  из пяти мне надо ОДИН и в той позиции(1 или 3 или 4)
+    в которой у таблицы ANSWERS уже есть ответы ПЛЮС ОДИН
+    (например уже одна запись есть значит на ПЕРВЫЙ ВОПРОС
+  уже ответ был проверен и в таблицу добавлен
+  а сейчас значит пришол ВТОРОЙ ОТВЕТ )*/
+
+    const necessaryQuestion = questionFive[amountAnswersFromCurrentUser];
+
+    console.log('asnwer');
+    console.log(necessaryQuestion);
+    console.log('asnwer');
+
+    /* necessaryQuestion - это нужная запись и в ней 
+     и вопрос и ответ и я буду с этой записью сравнивать
+     тот ответ что на ЭНДПОИНТ ПРИШОЛ ОТ ИГРАЮЩЕГО
+     ЮЗЕРА*/
+    isCorrectAnswer;
+  }
+
+  ///////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////
   async startGame(userId: string) {
     /*есть ли такой ЮЗЕР и дальше по коду
     понадобится запись-юзер  чтоб  связь
@@ -52,7 +119,8 @@ export class GameService {
     if (!rowConnectionTabl) {
       /*     если нет ожидающего игрока, - создаю ИГРУ +
              рандомные 5 вопросов к игре + создаю запись
-           в таблице ConnectionTabl  с status:panding*/
+           в таблице ConnectionTabl  с status:panding 
+           */
 
       //создаю ИГРУ
       const newGame: CreateGame = {
@@ -177,6 +245,12 @@ export class GameService {
       };
     }
 
+    ////////////////////////////////////////////////
+    /*  ВТОРАЯ ЧАСТЬ УСЛОВИЯ
+      --- rowConnectionTabl   в таблице ConnectionTabl  запись
+      со статусом   status:pandin*/
+    //////////////////////////////////////////////
+
     /*  а если один игрок уже ожидал - тогда
       --- прверю может это тот же юзер и ошибка 403*/
 
@@ -185,7 +259,8 @@ export class GameService {
     /*  а если один игрок уже ожидал - и пришедший
       сейчас это другой- тогда создам запись
       в таблице ConnectionTabl и также
-     status : 'Active' */
+     status : 'Active'
+     */
 
     /*надо получить запись-game чтобы создать связь
       между таблицами ConnectionTabl и Game*/
@@ -283,8 +358,5 @@ export class GameService {
       pairCreatedDate: player1.createdAt,
       startGameDate,
     };
-
-    /*  делаю данныеВИДА который ожидает фронтенд
-      для двух игроков */
   }
 }

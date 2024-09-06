@@ -1,68 +1,33 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InsertResult, Repository } from 'typeorm';
-import { Random } from '../api/types/dto';
-import { RandomQuestion } from '../domains/random-question.entity';
+import { ConnectionTabl } from '../domains/connection.entity';
+import { Connection, GameStatus } from '../api/types/dto';
+import { Answers } from '../domains/answers.entity';
 
 @Injectable()
-export class RandomQuestionRepository {
+export class AnswerRepository {
   constructor(
-    @InjectRepository(RandomQuestion)
-    private readonly randomQuestionRepository: Repository<RandomQuestion>,
+    @InjectRepository(Answers)
+    private readonly answersRepository: Repository<Answers>,
   ) {}
 
-  async createRandomRow(newRandom: Random) {
-    const result: InsertResult = await this.randomQuestionRepository
-      .createQueryBuilder()
-      .insert()
-      .into(RandomQuestion)
-      .values({
-        createdAt: newRandom.createdAt,
-        idGameFK: newRandom.idGameFK,
-        idQuestionFK: newRandom.idQuestionFK,
-        game: newRandom.game,
-        question: newRandom.question,
+  async amountAnswersFromCurrentUser(userId: string, idGame: string) {
+    const result = await this.answersRepository
+      .createQueryBuilder('a')
+      .where('a.idUser = :userId AND a.idGame= :idGame', {
+        userId,
+        idGame,
       })
-      .execute();
-
-    /*тут структура
-       InsertResult {
-         identifiers: [ { id: 3 } ],
-           generatedMaps: [ { id: 3 } ],
-           raw: [ { id: 3 } ]
-       }*/
-
-    return String(result.identifiers[0].idRandom);
-  }
-
-  /* тут получаю 5 рандомных вопросов в определенном порядке
-  и плюс к каждому вопросу из другой таблицы
-  конкретный вопрос и конкретный ответ */
-  async getQuestionsForGame(gameId: string) {
-    const result = await this.randomQuestionRepository
-      .createQueryBuilder('rand')
-      .leftJoinAndSelect('rand.question', 'question')
-      .where('rand.idGameFK= :gameId', { gameId })
-      .getMany();
+      .getCount();
 
     return result;
   }
-
-  /*  async getGameById(gameId: string) {
-    const result = await this.gameRepository
-      .createQueryBuilder('g')
-      .where('g.idGame = :gameId', { gameId })
-      .getOne();
-
-    if (!result) return null;
-
-    return result;
-  }*/
 
   /*  async findRowPanding() {
       const result = await this.connectionRepository
         .createQueryBuilder('c')
-        .where('c.status = :status', { status: 'panding' })
+        .where('c.status = :status', { status: GameStatus.PANDING })
         .getOne();
   
       /!* запрос  будет возвращать либо 
@@ -70,6 +35,50 @@ export class RandomQuestionRepository {
   
       return result;
     }*/
+
+  /* async createNewConnection(newConnectionTabl: Connection) {
+     const result: InsertResult = await this.connectionRepository
+       .createQueryBuilder()
+       .insert()
+       .into(ConnectionTabl)
+       .values({
+         createdAt: newConnectionTabl.createdAt,
+         status: newConnectionTabl.status,
+         idGameFK: newConnectionTabl.idGameFK,
+         idUserFK: newConnectionTabl.idUserFK,
+         usertyp: newConnectionTabl.usertyp,
+         game: newConnectionTabl.game,
+       })
+       .execute();
+ 
+     /!*тут структура
+        InsertResult {
+          identifiers: [ { id: 3 } ],
+            generatedMaps: [ { id: 3 } ],
+            raw: [ { id: 3 } ]
+        }*!/
+ 
+     return String(result.identifiers[0].id);
+   }
+ */
+  /*
+    async changePandingToActive(idConnection: string) {
+      const result = await this.connectionRepository
+        .createQueryBuilder()
+        .update(ConnectionTabl)
+        .set({ status: GameStatus.ACTIVE })
+        .where('idConnection=:idConnection', { idConnection })
+        .execute();
+  
+      /!* result это вот такая структура
+     UpdateResult { generatedMaps: [], raw: [], affected: 0 }
+      affected-- это количество измененных саписей
+    *!/
+  
+      if (result.affected === 0) return false;
+      return true;
+    }
+  */
 
   /*  async createNewQuestion(newQuestion: CreateQuestion) {
       const result: InsertResult = await this.questionRepository

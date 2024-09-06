@@ -36,7 +36,31 @@ export class GameController {
     }
   }
 
-  /*  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(AuthTokenGuard)
+  @HttpCode(HttpStatus.OK)
+  @Post('my-current/answers')
+  async setAnswer(@Req() request: Request) {
+    // когда AccessToken проверяю в AuthTokenGuard - тогда
+    // из него достаю userId и помещаю ее в request
+
+    const userId = request['userId'];
+
+    const dataAnswer = await this.gameService.setAnswer(userId);
+
+    if (dataAnswer) {
+      return dataAnswer;
+    } else {
+      /*вернут 403 если юзер не имеет  пару со
+      статусом ACTIVE или если ответил на все 5 вопросов
+      * */
+      throw new ForbiddenException(
+        'error:andpoint-pair-game-quiz/pairs/my-current/answers,method-post',
+      );
+    }
+  }
+}
+
+/*  @HttpCode(HttpStatus.NO_CONTENT)
     @Put(':id')
     async updateQuestion(
       @Param('id') questionId: string,
@@ -56,7 +80,7 @@ export class GameController {
       }
     }*/
 
-  /*  @HttpCode(HttpStatus.NO_CONTENT)
+/*  @HttpCode(HttpStatus.NO_CONTENT)
     @Delete(':id')
     async deleteQestionById(@Param('id') questionId: string) {
       const isDeleteQestionById =
@@ -71,7 +95,7 @@ export class GameController {
       }
     }*/
 
-  /*  @Get()
+/*  @Get()
     async getQestions(
       @Query() queryParamsQuestionInputModel: QueryParamsQuestionInputModel,
     ) {
@@ -82,7 +106,7 @@ export class GameController {
       return qestions;
     }*/
 
-  /*  @HttpCode(HttpStatus.NO_CONTENT)
+/*  @HttpCode(HttpStatus.NO_CONTENT)
     @Put(':id/publish')
     async updateStatusPublishForQuestion(
       @Param('id') questionId: string,
@@ -102,4 +126,3 @@ export class GameController {
         );
       }
     }*/
-}
