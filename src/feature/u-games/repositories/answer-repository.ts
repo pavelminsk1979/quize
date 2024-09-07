@@ -1,13 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InsertResult, Repository } from 'typeorm';
-import { ConnectionTabl } from '../domains/connection.entity';
-import {
-  AnswerStatus,
-  Connection,
-  CreateAnswer,
-  GameStatus,
-} from '../api/types/dto';
+import { AnswerStatus, CreateAnswer } from '../api/types/dto';
 import { Answers } from '../domains/answers.entity';
 
 @Injectable()
