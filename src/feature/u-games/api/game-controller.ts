@@ -81,6 +81,20 @@ export class GameController {
 
     return game;
   }
+
+  @UseGuards(AuthTokenGuard)
+  @HttpCode(HttpStatus.OK)
+  @Get('my-current')
+  async getUnfinishedGame(@Req() request: Request) {
+    // когда AccessToken проверяю в AuthTokenGuard - тогда
+    // из него достаю userId и помещаю ее в request
+
+    const userId = request['userId'];
+
+    const game = await this.gameService.getUnfinishedGame(userId);
+
+    return game;
+  }
 }
 
 /*  @HttpCode(HttpStatus.NO_CONTENT)
