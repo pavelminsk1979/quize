@@ -14,7 +14,7 @@ export class Game {
   public createdAt: string;
 
   @Column()
-  public isFinished: boolean;
+  public finishGameDate: string;
 
   @OneToMany(() => ConnectionTabl, 'game')
   public connectionTabl: ConnectionTabl;

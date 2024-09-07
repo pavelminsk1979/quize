@@ -20,6 +20,7 @@ import { Question } from '../../u-questions/domains/question.entity';
 import { RandomQuestionRepository } from '../repositories/random-question-repository';
 import { AnswerRepository } from '../repositories/answer-repository';
 import { Answers } from '../domains/answers.entity';
+import { Game } from '../domains/game.entity';
 
 @Injectable()
 export class GameService {
@@ -136,8 +137,6 @@ export class GameService {
    тогда игра завершена ЕСЛИ У ПАРЫ ТОЖЕ 5 ЗАПИСЕЙ 
    */
 
-    let amountAnswersPair;
-
     if (amountAnswers >= 5) {
       /*  надо найти  пару (две записи) для данной игры
         в таблице ConnectionTabl*/
@@ -159,19 +158,22 @@ export class GameService {
       /* узнаю  количество записей
        в  таблице Answers  для ИГРОКА_ПАРЫ  */
 
-      amountAnswersPair =
+      const amountAnswersPair =
         await this.answerRepository.amountAnswersFromCurrentUser(
           pairIdUser,
           idGame,
         );
 
-      return { amountAnswers: pairIdUser };
+      /*  если и у второго юзера в данной паре
+         пять записей - ЗНАЧИТ ИГРА ЗАВЕРШЕНА
+         и надо в таблице ConnectionTabl установить
+         status  на Finished ( для обойх юзеров)
+         --  и дату окончания игры поставить
+         в таблице Game*/
+      if (amountAnswersPair >= 5) {
+      }
 
-      const amountAnswersPair =
-        await this.answerRepository.amountAnswersFromCurrentUser(
-          userId,
-          idGame,
-        );
+      return { amountAnswers: pairIdUser };
     }
 
     //на фронт возвращаю viewModel
