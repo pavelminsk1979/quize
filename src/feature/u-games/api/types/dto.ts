@@ -9,7 +9,7 @@ export type CreateGame = {
 
 export type Connection = {
   createdAt: string;
-  status: string;
+  status: GameStatus;
   idGameFK: string;
   idUserFK: string;
   usertyp: Usertyp;

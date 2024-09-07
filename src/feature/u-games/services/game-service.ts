@@ -156,7 +156,40 @@ export class GameService {
       };
     });
 
-    return questionForGame;
+    /*  по ГЕЙМАЙДИ в таблице  ConnectionTabl  возму значения к
+     status: 1,
+       pairCreatedDate: 1,
+       startGameDate: 1,
+       -- значение в поле createdAt для юзера который 
+     первым создал игру-ТОЕСТЬ ДАТА БОЛЕЕ СТАРАЯ 
+     это будет pairCreatedDate 
+     --- а когда второй вошол - ЭТО БОЛЕЕ 
+     СВЕЖАЯ ДАТА И ЭТО startGameDate*/
+
+    const rowConnectionTabl =
+      await this.connectionRepository.getTwoRowForCorrectGameByGameId(gameId);
+
+    /* ---  первый в списке  это к паре - он игру создал
+     --второй в списке -- создал пару иждет игрока еще одного*/
+
+    const startGameDate = rowConnectionTabl[0].createdAt;
+
+    const pairCreatedDate = rowConnectionTabl[1].createdAt;
+
+    /*по ГЕЙМАЙДИ  из таблицы  Game   достану запись и в ней 
+    finishGameDate дата  завершения игры
+     */
+
+    const rowGame = await this.gameRepository.getGameById(gameId);
+
+    if (!rowGame) {
+      throw new NotFoundException(
+        'rowGame not found...file:game-service...  method:getGameById',
+      );
+    }
+
+    const finishGameDate = rowGame.finishGameDate;
+
     /*    return {
           twoIdUsers: twoIdUsers,
           secondUserId: secondUserId,
@@ -179,9 +212,9 @@ export class GameService {
 
       questions: viewQuestions,
       status: 1,
-      pairCreatedDate: 1,
-      startGameDate: 1,
-      finishGameDate: 1,
+      pairCreatedDate,
+      startGameDate,
+      finishGameDate,
     };
   }
 

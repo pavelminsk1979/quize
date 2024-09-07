@@ -11,6 +11,27 @@ export class ConnectionRepository {
     private readonly connectionRepository: Repository<ConnectionTabl>,
   ) {}
 
+  /*разница с методом findTwoRowForCorrectGameByGameId  у метода
+  getTwoRowForCorrectGameByGameId что у второго есть сортировка
+  --сортировка нужна чтоб определить дату более старую
+  и это будет юзер который пару создал
+  ---  первый в списке  это к паре - он игру создал
+   --второй в списке -- создал пару иждет игрока еще одного */
+  async getTwoRowForCorrectGameByGameId(idGame: string) {
+    const result = await this.connectionRepository
+      .createQueryBuilder('c')
+      .where('c.idGameFK = :idGame', { idGame })
+      .orderBy('c.createdAt', 'DESC')
+      .getMany();
+
+    /* запрос  будет возвращать либо
+     массив объектов (записей) из таблицы ConnectionTabl,
+      либо если таких записей в таблице нет, то result
+       будет пустым массивом [].*/
+
+    return result;
+  }
+
   async findRowActiveByUserId(userId: string) {
     const result = await this.connectionRepository
       .createQueryBuilder('c')

@@ -43,6 +43,7 @@ export class RandomQuestionRepository {
       .createQueryBuilder('rand')
       .leftJoinAndSelect('rand.question', 'question')
       .where('rand.idGameFK= :gameId', { gameId })
+      .orderBy('rand.idRandom', 'ASC')
       .getMany();
 
     return result;

@@ -1,6 +1,7 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Usertyp } from '../../users/domains/usertyp.entity';
 import { Game } from './game.entity';
+import { GameStatus } from '../api/types/dto';
 
 @Entity()
 /*не создает таблицы без
@@ -14,7 +15,7 @@ export class ConnectionTabl {
   public createdAt: string;
 
   @Column()
-  public status: string;
+  public status: GameStatus;
 
   @Column()
   public idGameFK: string;
