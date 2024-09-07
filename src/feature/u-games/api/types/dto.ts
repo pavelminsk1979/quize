@@ -4,7 +4,7 @@ import { Question } from '../../../u-questions/domains/question.entity';
 
 export type CreateGame = {
   createdAt: string;
-  isFinished: boolean;
+  finishGameDate: null;
 };
 
 export type Connection = {

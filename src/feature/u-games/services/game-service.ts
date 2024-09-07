@@ -171,9 +171,12 @@ export class GameService {
          --  и дату окончания игры поставить
          в таблице Game*/
       if (amountAnswersPair >= 5) {
-      }
+        await this.connectionRepository.changeActiveToFinished(idGame);
 
-      return { amountAnswers: pairIdUser };
+        const dateFinishGame = new Date().toISOString();
+
+        await this.gameRepository.setDateFinished(idGame, dateFinishGame);
+      }
     }
 
     //на фронт возвращаю viewModel
@@ -226,7 +229,7 @@ export class GameService {
       //создаю ИГРУ
       const newGame: CreateGame = {
         createdAt: new Date().toISOString(),
-        isFinished: false,
+        finishGameDate: null,
       };
       const gameId: string = await this.gameRepository.createGame(newGame);
 

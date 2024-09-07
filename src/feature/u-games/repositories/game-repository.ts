@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InsertResult, Repository } from 'typeorm';
 import { Game } from '../domains/game.entity';
-import { CreateGame } from '../api/types/dto';
+import { CreateGame, GameStatus } from '../api/types/dto';
+import { ConnectionTabl } from '../domains/connection.entity';
 
 @Injectable()
 export class GameRepository {
@@ -11,6 +12,23 @@ export class GameRepository {
     private readonly gameRepository: Repository<Game>,
   ) {}
 
+  async setDateFinished(idGame: string, finishGameDate: string) {
+    const result = await this.gameRepository
+      .createQueryBuilder()
+      .update(Game)
+      .set({ finishGameDate })
+      .where('idGame= :idGame', { idGame })
+      .execute();
+
+    /* result это вот такая структура
+   UpdateResult { generatedMaps: [], raw: [], affected: 0 }
+    affected-- это количество измененных саписей
+  */
+
+    if (result.affected === 0) return false;
+    return true;
+  }
+
   async createGame(newGame: CreateGame) {
     const result: InsertResult = await this.gameRepository
       .createQueryBuilder()
@@ -18,7 +36,7 @@ export class GameRepository {
       .into(Game)
       .values({
         createdAt: newGame.createdAt,
-        isFinished: newGame.isFinished,
+        finishGameDate: newGame.finishGameDate,
       })
       .execute();
 

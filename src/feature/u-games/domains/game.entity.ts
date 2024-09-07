@@ -13,8 +13,8 @@ export class Game {
   @Column()
   public createdAt: string;
 
-  @Column()
-  public finishGameDate: string;
+  @Column({ type: 'text', nullable: true })
+  public finishGameDate: string | null;
 
   @OneToMany(() => ConnectionTabl, 'game')
   public connectionTabl: ConnectionTabl;

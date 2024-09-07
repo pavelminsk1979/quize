@@ -93,6 +93,22 @@ export class ConnectionRepository {
 
     return result;
   }
+  async changeActiveToFinished(idGame: string) {
+    const result = await this.connectionRepository
+      .createQueryBuilder()
+      .update(ConnectionTabl)
+      .set({ status: GameStatus.FINISHED })
+      .where('idGameFK=:idGame', { idGame })
+      .execute();
+
+    /* result это вот такая структура
+   UpdateResult { generatedMaps: [], raw: [], affected: 0 }
+    affected-- это количество измененных саписей
+  */
+
+    if (result.affected === 0) return false;
+    return true;
+  }
 
   /*  async createNewQuestion(newQuestion: CreateQuestion) {
       const result: InsertResult = await this.questionRepository
