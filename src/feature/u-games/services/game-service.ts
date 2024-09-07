@@ -141,7 +141,22 @@ export class GameService {
 
     const viewPlayer2 = { id: secondUserId, login: player2.login };
 
-    return viewPlayer2;
+    /*   надо взять вопросы по ИДИГРЫ и создать структуру
+       questions: [
+        {id: string;body: string;},
+       ],*/
+
+    const questionForGame =
+      await this.randomQuestionRepository.getQuestionsForGame(gameId);
+
+    const viewQuestions = questionForGame.map((el) => {
+      return {
+        id: el.idQuestionFK,
+        body: el.question.body,
+      };
+    });
+
+    return questionForGame;
     /*    return {
           twoIdUsers: twoIdUsers,
           secondUserId: secondUserId,
@@ -162,12 +177,7 @@ export class GameService {
         score: score2,
       },
 
-      questions: [
-        {
-          id: 1,
-          body: 1,
-        },
-      ],
+      questions: viewQuestions,
       status: 1,
       pairCreatedDate: 1,
       startGameDate: 1,
