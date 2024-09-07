@@ -80,6 +80,20 @@ export class ConnectionRepository {
     return true;
   }
 
+  async findTwoRowForCorrectGameByGameId(idGame: string) {
+    const result = await this.connectionRepository
+      .createQueryBuilder('c')
+      .where('c.idGameFK = :idGame', { idGame })
+      .getMany();
+
+    /* запрос  будет возвращать либо
+     массив объектов (записей) из таблицы ConnectionTabl,
+      либо если таких записей в таблице нет, то result
+       будет пустым массивом [].*/
+
+    return result;
+  }
+
   /*  async createNewQuestion(newQuestion: CreateQuestion) {
       const result: InsertResult = await this.questionRepository
         .createQueryBuilder()

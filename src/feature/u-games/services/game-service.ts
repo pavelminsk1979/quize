@@ -121,6 +121,59 @@ export class GameService {
     //запись в таблицу Answers
     await this.answerRepository.createAnswer(newAnswer);
 
+    /*надо запросить количество записей в таблице
+    Answers для данного юзера по idUser и если
+      записей 5 ---
+    --И ДАЛЕЕ  запросить количество записей
+      в этойже таблице для ИГРОКА_ПАРЫ  и если
+    их 5 ---тогда сменить статус АКТИВ на Finished
+    и плюс  ТОГДА ДАТУ ЗАВЕРШЕНИЯ ИГРЫ УСТАНОВИТЬ*/
+
+    const amountAnswers =
+      await this.answerRepository.amountAnswersFromCurrentUser(userId, idGame);
+    /*  если в таблице  ANSWERS  для данной
+   userId  и  idGame имеются 5 и более записей
+   тогда игра завершена ЕСЛИ У ПАРЫ ТОЖЕ 5 ЗАПИСЕЙ 
+   */
+
+    let amountAnswersPair;
+
+    if (amountAnswers >= 5) {
+      /*  надо найти  пару (две записи) для данной игры
+        в таблице ConnectionTabl*/
+
+      const twoRowForCorrectGameByGameId =
+        await this.connectionRepository.findTwoRowForCorrectGameByGameId(
+          idGame,
+        );
+
+      //из записи достану две айдишки
+
+      const twoId = twoRowForCorrectGameByGameId.map((el) => el.idUserFK);
+
+      /* оставлю одну айдишку- та которая партнера в 
+       данной игре */
+
+      const pairIdUser = twoId.filter((el) => el !== userId)[0];
+
+      /* узнаю  количество записей
+       в  таблице Answers  для ИГРОКА_ПАРЫ  */
+
+      amountAnswersPair =
+        await this.answerRepository.amountAnswersFromCurrentUser(
+          pairIdUser,
+          idGame,
+        );
+
+      return { amountAnswers: pairIdUser };
+
+      const amountAnswersPair =
+        await this.answerRepository.amountAnswersFromCurrentUser(
+          userId,
+          idGame,
+        );
+    }
+
     //на фронт возвращаю viewModel
 
     return {
