@@ -2,8 +2,10 @@ import {
   Body,
   Controller,
   ForbiddenException,
+  Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   Req,
   UseGuards,
@@ -64,6 +66,20 @@ export class GameController {
         'error:andpoint-pair-game-quiz/pairs/my-current/answers,method-post',
       );
     }
+  }
+
+  @UseGuards(AuthTokenGuard)
+  @HttpCode(HttpStatus.OK)
+  @Get(':id')
+  async getGameById(@Param('id') gameId: string, @Req() request: Request) {
+    // когда AccessToken проверяю в AuthTokenGuard - тогда
+    // из него достаю userId и помещаю ее в request
+
+    const userId = request['userId'];
+
+    const game = await this.gameService.getGameById(userId, gameId);
+
+    return game;
   }
 }
 

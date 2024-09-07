@@ -2,7 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InsertResult, Repository } from 'typeorm';
 import { ConnectionTabl } from '../domains/connection.entity';
-import { Connection, CreateAnswer, GameStatus } from '../api/types/dto';
+import {
+  AnswerStatus,
+  Connection,
+  CreateAnswer,
+  GameStatus,
+} from '../api/types/dto';
 import { Answers } from '../domains/answers.entity';
 
 @Injectable()
@@ -11,6 +16,18 @@ export class AnswerRepository {
     @InjectRepository(Answers)
     private readonly answersRepository: Repository<Answers>,
   ) {}
+
+  async amountCorrectAnswersFromCurrentUser(userId: string) {
+    const result = await this.answersRepository
+      .createQueryBuilder('a')
+      .where('a.idUser = :userId AND a.answerStatus= :answerStatus', {
+        userId,
+        answerStatus: AnswerStatus.CORRECT,
+      })
+      .getCount();
+
+    return result;
+  }
 
   async createAnswer(newAnswer: CreateAnswer) {
     const result: InsertResult = await this.answersRepository
@@ -44,6 +61,15 @@ export class AnswerRepository {
         idGame,
       })
       .getCount();
+
+    return result;
+  }
+
+  async getAnswersByUserId(idUser: string) {
+    const result = await this.answersRepository
+      .createQueryBuilder('a')
+      .where('a.idUser= :idUser', { idUser })
+      .getMany();
 
     return result;
   }

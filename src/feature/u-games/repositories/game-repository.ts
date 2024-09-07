@@ -2,8 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InsertResult, Repository } from 'typeorm';
 import { Game } from '../domains/game.entity';
-import { CreateGame, GameStatus } from '../api/types/dto';
-import { ConnectionTabl } from '../domains/connection.entity';
+import { CreateGame } from '../api/types/dto';
 
 @Injectable()
 export class GameRepository {

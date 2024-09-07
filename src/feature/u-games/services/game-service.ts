@@ -1,5 +1,8 @@
 import {
+  BadRequestException,
+  ForbiddenException,
   Injectable,
+  NotFoundException,
   ServiceUnavailableException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -19,7 +22,6 @@ import { UserSqlTypeormRepository } from '../../users/repositories/user-sql-type
 import { Question } from '../../u-questions/domains/question.entity';
 import { RandomQuestionRepository } from '../repositories/random-question-repository';
 import { AnswerRepository } from '../repositories/answer-repository';
-import { Answers } from '../domains/answers.entity';
 import { Game } from '../domains/game.entity';
 
 @Injectable()
@@ -32,6 +34,152 @@ export class GameService {
     protected randomQuestionRepository: RandomQuestionRepository,
     protected answerRepository: AnswerRepository,
   ) {}
+
+  async getGameById(userId: string, gameId: string) {
+    if (gameId.length > 5) {
+      throw new BadRequestException(
+        'id invalid...file:game-service...  method:getGameById',
+      );
+    }
+    const game: Game | null = await this.gameRepository.getGameById(gameId);
+
+    if (!game) {
+      throw new NotFoundException(
+        'game not found...file:game-service...  method:getGameById',
+      );
+    }
+
+    /* надо по АЙДИшкеИГРЫ взять ПАРУ игроков из
+     таблицы ConnectionTabl*/
+
+    const twoPlayers =
+      await this.connectionRepository.findTwoRowForCorrectGameByGameId(gameId);
+
+    const twoIdUsers = twoPlayers.map((el) => el.idUserFK);
+
+    const isPlayCurrentUser = twoIdUsers.find((el) => el === userId);
+
+    if (!isPlayCurrentUser) {
+      throw new ForbiddenException(
+        'user not play in current game...file:game-service...  method:getGameById',
+      );
+    }
+
+    const secondUserId = twoIdUsers.find((el) => el !== userId);
+
+    if (!secondUserId) {
+      throw new NotFoundException(
+        'secondUserId not found...file:game-service...  method:getGameById',
+      );
+    }
+
+    /*    есть две айдишки userId и secondUserId - сделаю
+         для каждого игрока запрос в таблицу Answers
+        и создам ответ вида     answers: [
+          {
+            questionId: 1,
+            answerStatus: 1,
+            addedAt: 1,
+          },
+        ],*/
+
+    const answersFirstUser =
+      await this.answerRepository.getAnswersByUserId(userId);
+
+    const viewAnswers1 = answersFirstUser.map((el) => {
+      return {
+        questionId: el.idQuestion,
+        answerStatus: el.answerStatus,
+        addedAt: el.createdAt,
+      };
+    });
+
+    const answersSecondUser =
+      await this.answerRepository.getAnswersByUserId(secondUserId);
+
+    const viewAnswers2 = answersSecondUser.map((el) => {
+      return {
+        questionId: el.idQuestion,
+        answerStatus: el.answerStatus,
+        addedAt: el.createdAt,
+      };
+    });
+
+    //найду количество баллов для обоих игроков
+
+    const score1 =
+      await this.answerRepository.amountCorrectAnswersFromCurrentUser(userId);
+
+    const score2 =
+      await this.answerRepository.amountCorrectAnswersFromCurrentUser(
+        secondUserId,
+      );
+
+    /*   найду ЛОГИНЫ игроков из таблицы Usertyp
+       чтобы создать viewPlayer -  player: {
+         id: 1,
+           login: 1,
+       },*/
+    const player1 = await this.userSqlTypeormRepository.getUserById(userId);
+
+    if (!player1) {
+      throw new NotFoundException(
+        'player1 not found...file:game-service...  method:getGameById',
+      );
+    }
+
+    const viewPlayer1 = { id: userId, login: player1.login };
+
+    const player2 =
+      await this.userSqlTypeormRepository.getUserById(secondUserId);
+
+    if (!player2) {
+      throw new NotFoundException(
+        'player2 not found...file:game-service...  method:getGameById',
+      );
+    }
+
+    const viewPlayer2 = { id: secondUserId, login: player2.login };
+
+    return viewPlayer2;
+    /*    return {
+          twoIdUsers: twoIdUsers,
+          secondUserId: secondUserId,
+          userId: userId,
+        };*/
+    return {
+      id: gameId,
+      firstPlayerProgress: {
+        answers: viewAnswers1,
+
+        player: viewPlayer1,
+        score: score1,
+      },
+      secondPlayerProgress: {
+        answers: viewAnswers2,
+
+        player: viewPlayer2,
+        score: score2,
+      },
+
+      questions: [
+        {
+          id: 1,
+          body: 1,
+        },
+      ],
+      status: 1,
+      pairCreatedDate: 1,
+      startGameDate: 1,
+      finishGameDate: 1,
+    };
+  }
+
+  ///////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////
 
   async setAnswer(userId: string, answer: string) {
     /*  у таблицы ConnectionTabl поискать по userId - есть ли

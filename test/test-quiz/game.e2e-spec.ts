@@ -32,6 +32,8 @@ describe('tests for andpoint users', () => {
 
   let answer1;
 
+  let gameId;
+
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -315,7 +317,10 @@ describe('tests for andpoint users', () => {
       .post('/pair-game-quiz/pairs/connection')
       .set('Authorization', `Bearer ${accessToken1}`)
       .expect(200);
-    //console.log(res.body);
+    /* console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+     console.log(res.body.id);
+     console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&');*/
+    gameId = res.body.id;
   });
 
   it('start game, one more time, first player for error 403', async () => {
@@ -365,6 +370,14 @@ describe('tests for andpoint users', () => {
       .post('/pair-game-quiz/pairs/my-current/answers')
       .set('Authorization', `Bearer ${accessToken1}`)
       .send({ answer: answer1 })
+      .expect(200);
+    //console.log(res.body);
+  });
+
+  it('get game by id', async () => {
+    const res = await request(app.getHttpServer())
+      .get(`/pair-game-quiz/pairs/${gameId}`)
+      .set('Authorization', `Bearer ${accessToken1}`)
       .expect(200);
     console.log(res.body);
   });
