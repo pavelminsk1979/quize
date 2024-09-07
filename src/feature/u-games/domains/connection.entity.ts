@@ -28,6 +28,12 @@ export class ConnectionTabl {
 
   @ManyToOne(() => Game, 'connectionTabl')
   public game: Game;
+
+  @Column({ type: 'text', nullable: true })
+  public rightanswer: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  public bonus: string | null;
 }
 
 //одна игра - два(много\несколько- всего два) подключения

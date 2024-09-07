@@ -100,15 +100,47 @@ export class GameService {
       };
     });
 
-    //найду количество баллов для обоих игроков
+    /*найду количество баллов для обоих игроков
+    также нахожу БОНУС в таблице ConnectionTabl*/
 
     const score1 =
       await this.answerRepository.amountCorrectAnswersFromCurrentUser(userId);
+
+    const rowConnectionTabl1 =
+      await this.connectionRepository.findRowByUseridAndGameId(userId, gameId);
+    if (!rowConnectionTabl1) {
+      throw new NotFoundException(
+        'rowConnectionTabl not found...file:game-service...  method:getGameById',
+      );
+    }
+    let bonus1;
+    if (rowConnectionTabl1.bonus === 'ok') {
+      bonus1 = 1;
+    }
+
+    const resScore1 = score1 + bonus1;
 
     const score2 =
       await this.answerRepository.amountCorrectAnswersFromCurrentUser(
         secondUserId,
       );
+
+    const rowConnectionTabl2 =
+      await this.connectionRepository.findRowByUseridAndGameId(
+        secondUserId,
+        gameId,
+      );
+    if (!rowConnectionTabl2) {
+      throw new NotFoundException(
+        'rowConnectionTabl2 not found...file:game-service...  method:getGameById',
+      );
+    }
+    let bonus2;
+    if (rowConnectionTabl2.bonus === 'ok') {
+      bonus2 = 1;
+    }
+
+    const resScore2 = score2 + bonus2;
 
     /*   найду ЛОГИНЫ игроков из таблицы Usertyp
        чтобы создать viewPlayer -  player: {
@@ -155,10 +187,10 @@ export class GameService {
      status: 1,
        pairCreatedDate: 1,
        startGameDate: 1,
-       -- значение в поле createdAt для юзера который 
-     первым создал игру-ТОЕСТЬ ДАТА БОЛЕЕ СТАРАЯ 
-     это будет pairCreatedDate 
-     --- а когда второй вошол - ЭТО БОЛЕЕ 
+       -- значение в поле createdAt для юзера который
+     первым создал игру-ТОЕСТЬ ДАТА БОЛЕЕ СТАРАЯ
+     это будет pairCreatedDate
+     --- а когда второй вошол - ЭТО БОЛЕЕ
      СВЕЖАЯ ДАТА И ЭТО startGameDate*/
 
     const rowConnectionTabl =
@@ -171,7 +203,7 @@ export class GameService {
 
     const pairCreatedDate = rowConnectionTabl[1].createdAt;
 
-    /*по ГЕЙМАЙДИ  из таблицы  Game   достану запись и в ней 
+    /*по ГЕЙМАЙДИ  из таблицы  Game   достану запись и в ней
     finishGameDate дата  завершения игры
      */
 
@@ -196,13 +228,13 @@ export class GameService {
         answers: viewAnswers1,
 
         player: viewPlayer1,
-        score: score1,
+        score: resScore1,
       },
       secondPlayerProgress: {
         answers: viewAnswers2,
 
         player: viewPlayer2,
-        score: score2,
+        score: resScore2,
       },
 
       questions: viewQuestions,
@@ -285,15 +317,47 @@ export class GameService {
       };
     });
 
-    //найду количество баллов для обоих игроков
+    /*найду количество баллов для обоих игроков
+    также нахожу БОНУС в таблице ConnectionTabl*/
 
     const score1 =
       await this.answerRepository.amountCorrectAnswersFromCurrentUser(userId);
+
+    const rowConnectionTabl1 =
+      await this.connectionRepository.findRowByUseridAndGameId(userId, gameId);
+    if (!rowConnectionTabl1) {
+      throw new NotFoundException(
+        'rowConnectionTabl not found...file:game-service...  method:getGameById',
+      );
+    }
+    let bonus1;
+    if (rowConnectionTabl1.bonus === 'ok') {
+      bonus1 = 1;
+    }
+
+    const resScore1 = score1 + bonus1;
 
     const score2 =
       await this.answerRepository.amountCorrectAnswersFromCurrentUser(
         secondUserId,
       );
+
+    const rowConnectionTabl2 =
+      await this.connectionRepository.findRowByUseridAndGameId(
+        secondUserId,
+        gameId,
+      );
+    if (!rowConnectionTabl2) {
+      throw new NotFoundException(
+        'rowConnectionTabl2 not found...file:game-service...  method:getGameById',
+      );
+    }
+    let bonus2;
+    if (rowConnectionTabl2.bonus === 'ok') {
+      bonus2 = 1;
+    }
+
+    const resScore2 = score2 + bonus2;
 
     /*   найду ЛОГИНЫ игроков из таблицы Usertyp
        чтобы создать viewPlayer -  player: {
@@ -381,13 +445,13 @@ export class GameService {
         answers: viewAnswers1,
 
         player: viewPlayer1,
-        score: score1,
+        score: resScore1,
       },
       secondPlayerProgress: {
         answers: viewAnswers2,
 
         player: viewPlayer2,
-        score: score2,
+        score: resScore2,
       },
 
       questions: viewQuestions,
@@ -417,6 +481,8 @@ export class GameService {
     //если нет- 403 ошибка
 
     if (!userActive) return null;
+
+    const connectionUserId1 = userActive.idConnection;
 
     //айдишка игры
     const idGame = userActive.idGameFK;
@@ -494,7 +560,7 @@ export class GameService {
     await this.answerRepository.createAnswer(newAnswer);
 
     /*ТУТ ПРО ДОПОЛНИТЕЛЬНЫЙ БАЛЛ ДЛЯ ПЕРВОГО ОТВЕТИВШЕГО
-    НА 5 ВОПРОСОВ
+    НА 5 ВОПРОСОВ  ЭТО ЧАСТЬ 1,   часть2 ниже далеко
      ---на каждый правильный ответ в таблице ConnectionTabl
       поле rightanswer изменяю на 'ok' даже если там уже
       есть это 'ok' но первоначально будет null
@@ -502,9 +568,13 @@ export class GameService {
       и также если у другого игрока меньше 5-ти
       ответов ТОГДА В ТАБЛИЦЕ ConnectionTabl в
       поле bonus изменю на 'ok'
+*/
 
-    */
-
+    if (findResult) {
+      await this.connectionRepository.updateRowRightAnswer(
+        String(connectionUserId1),
+      );
+    }
     /*надо запросить количество записей в таблице
     Answers для данного юзера по idUser и если
       записей 5 ---
@@ -559,6 +629,33 @@ export class GameService {
         const dateFinishGame = new Date().toISOString();
 
         await this.gameRepository.setDateFinished(idGame, dateFinishGame);
+      }
+
+      /*ТУТ ПРО ДОПОЛНИТЕЛЬНЫЙ БАЛЛ ДЛЯ ПЕРВОГО ОТВЕТИВШЕГО
+      НА 5 ВОПРОСОВ  ЭТО ЧАСТЬ 2,   часть1 выше  далеко
+       ---на каждый правильный ответ в таблице ConnectionTabl
+        поле rightanswer изменяю на 'ok' даже если там уже
+        есть это 'ok' но первоначально будет null
+        ---когда будет 5 ответ и если rightanswer:'ok'
+        и также если у другого игрока меньше 5-ти
+        ответов ТОГДА В ТАБЛИЦЕ ConnectionTabl в
+        поле bonus изменю на 'ok'
+  */
+      if (amountAnswersPair < 5) {
+        const getRowByIdConnection =
+          await this.connectionRepository.getRowByIdConnection(
+            String(connectionUserId1),
+          );
+        if (!getRowByIdConnection) {
+          throw new NotFoundException(
+            'getRowByIdConnection not found...file:game-service...  method:setAnswer',
+          );
+        }
+        if (getRowByIdConnection.rightanswer === 'ok') {
+          await this.connectionRepository.updateRowBonus(
+            String(connectionUserId1),
+          );
+        }
       }
     }
 
