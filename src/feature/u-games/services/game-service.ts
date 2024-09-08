@@ -36,13 +36,14 @@ export class GameService {
   ) {}
 
   async getUnfinishedGame(userId: string) {
-    /*если для текущего юзера нет пары
-    - вернуть 404  */
-
+    /*ищу запись по айдишке со статусом 
+    ЭКТИВ тоесть игра началась и пара имеется */
     const rowWithStatusActiveFromConnectionTabl: ConnectionTabl | null =
       await this.connectionRepository.findRowActiveByUserId(userId);
 
     if (!rowWithStatusActiveFromConnectionTabl) {
+      //тут если один юзер и ожидает другого
+
       const rowWithStatusPandingFromConnectionTabl: ConnectionTabl | null =
         await this.connectionRepository.findRowPandingByUserId(userId);
 
@@ -132,6 +133,15 @@ export class GameService {
 
       return this.viewOnePlayer(gameId, rowUser, rowConnectionTabl.createdAt);
     }
+
+    /*есть две айдишки userId и secondUserId
+     * и надо разобратся ОСНОВЫВАЯСЬ НА ДАТЕ СОЗДАНИЯ
+     * кто первый создан а кто второй --ИБО ЭТО ВАЖНО
+     * КОГДА ОТДАЮ ВЬЮМОДЕЛЬ в ней первый игрок и вторй и
+     * дата создания пары(первый игрок) и дата
+     * начала игры(второй игрок)
+     * ----в таблице ConnectionTabl есть даты - их надо
+     * сравнить и кто старая - тот первый*/
 
     /*    есть две айдишки userId и secondUserId - сделаю
          для каждого игрока запрос в таблицу Answers
@@ -233,7 +243,7 @@ export class GameService {
 
     const viewPlayer2 = { id: secondUserId, login: player2.login };
 
-    /*   надо взять вопросы по ИДИГРЫ и создать структуру
+    /*   надо взять вопросы по aИДИГРЫ и создать структуру
        questions: [
         {id: string;body: string;},
        ],*/
@@ -661,8 +671,9 @@ export class GameService {
     }
 
     ////////////////////////////////////////////////
-    /*  ВТОРАЯ ЧАСТЬ УСЛОВИЯ
-      --- rowConnectionTabl   в таблице ConnectionTabl  запись
+    /*  ВТОРАЯ ЧАСТЬ УСЛОВИЯ  user - второй игрок
+      --- rowConnectionTabl (первый игрок)  в таблице
+       ConnectionTabl  запись
       со статусом   status:pandin*/
     //////////////////////////////////////////////
 
@@ -750,12 +761,13 @@ export class GameService {
     структура ответа прописана в свагере
     типизация  - RequestFirstPlayer*/
 
+    //ПЕРЕВЕРНУТЫ ЗНАЧЕНИЯ ПЛЭЕРОВ- И ТЕСТЫ ПРОШЛИ
     return {
       id: rowConnectionTabl.idGameFK,
       firstPlayerProgress: {
         answers: [],
         player: {
-          id: player1.id,
+          id: rowConnectionTabl.idUserFK,
           login: player1.login,
         },
         score: 0,
@@ -770,7 +782,7 @@ export class GameService {
       },
       questions: viewQuestions,
       status: GameStatus.ACTIVE,
-      pairCreatedDate: player1.createdAt,
+      pairCreatedDate: rowConnectionTabl.createdAt,
       startGameDate,
       finishGameDate: null,
     };

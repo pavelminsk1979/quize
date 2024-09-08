@@ -94,34 +94,34 @@ describe('tests for andpoint users', () => {
     //console.log(accessToken1);
   });
 
-  /*  it('create user2', async () => {
-      await request(app.getHttpServer())
-        .post('/sa/users')
-        .set('Authorization', `Basic ${loginPasswordBasic64}`)
-        .send({
-          login: login2,
-          password: password2,
-          email: email2,
-        })
-        .expect(201);
-  
-      //userId = res.body.id;
-  
-      //console.log(res.body);
-    });*/
+  it('create user2', async () => {
+    await request(app.getHttpServer())
+      .post('/sa/users')
+      .set('Authorization', `Basic ${loginPasswordBasic64}`)
+      .send({
+        login: login2,
+        password: password2,
+        email: email2,
+      })
+      .expect(201);
 
-  /*  it('login  user2', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/auth/login')
-        .send({
-          loginOrEmail: login2,
-          password: password2,
-        })
-        .expect(200);
-  
-      accessToken2 = res.body.accessToken;
-      //console.log(accessToken2);
-    });*/
+    //userId = res.body.id;
+
+    //console.log(res.body);
+  });
+
+  it('login  user2', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({
+        loginOrEmail: login2,
+        password: password2,
+      })
+      .expect(200);
+
+    accessToken2 = res.body.accessToken;
+    //console.log(accessToken2);
+  });
 
   it('create question1', async () => {
     const res = await request(app.getHttpServer())
@@ -228,20 +228,20 @@ describe('tests for andpoint users', () => {
     questionId8 = res.body.id;
   });
 
-  /*  it('get questions + pagination', async () => {
-      await request(app.getHttpServer())
-        .get('/sa/quiz/questions')
-        .set('Authorization', `Basic ${loginPasswordBasic64}`)
-  
-        .expect(200);
-      /!*   console.log('@@@@@@@@@@@@@@@@@@@@@@@@');
-         console.log(res.body.items[0].correctAnswers[0]);
-         console.log('@@@@@@@@@@@@@@@@@@@@@@@@');
-         answer1 = res.body.items[0].correctAnswers[0].slice(0, 2);
-         console.log('-------------------------------------');
-         console.log(answer1);
-         console.log('-------------------------------------');*!/
-    });*/
+  it('get questions + pagination', async () => {
+    await request(app.getHttpServer())
+      .get('/sa/quiz/questions')
+      .set('Authorization', `Basic ${loginPasswordBasic64}`)
+
+      .expect(200);
+    /*   console.log('@@@@@@@@@@@@@@@@@@@@@@@@');
+       console.log(res.body.items[0].correctAnswers[0]);
+       console.log('@@@@@@@@@@@@@@@@@@@@@@@@');
+       answer1 = res.body.items[0].correctAnswers[0].slice(0, 2);
+       console.log('-------------------------------------');
+       console.log(answer1);
+       console.log('-------------------------------------');*/
+  });
 
   it('update  Status Publish For Question1', async () => {
     await request(app.getHttpServer())
@@ -423,101 +423,101 @@ describe('tests for andpoint users', () => {
     console.log('-------------------------------------');*/
   });
 
-  /* it('start game second player', async () => {
-     const res = await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/connection')
-       .set('Authorization', `Bearer ${accessToken2}`)
-       .expect(200);
-     //console.log(res.body);
- 
-     /!*  console.log('@@@@@@@@@@@@@@@@@@@@@@@@');
-       console.log(res.body);
-       console.log('@@@@@@@@@@@@@@@@@@@@@@@@');*!/
-     const idQuestion = res.body.questions[0].id;
-     const idQuestion2 = res.body.questions[1].id;
-     const idQuestion3 = res.body.questions[2].id;
-     const idQuestion4 = res.body.questions[3].id;
-     const idQuestion5 = res.body.questions[4].id;
- 
-     const dataSource = await app.resolve(DataSource);
-     const result = await dataSource.query(
-       `
+  it('start game second player', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/connection')
+      .set('Authorization', `Bearer ${accessToken2}`)
+      .expect(200);
+    //console.log(res.body);
+
+    /*  console.log('@@@@@@@@@@@@@@@@@@@@@@@@');
+      console.log(res.body);
+      console.log('@@@@@@@@@@@@@@@@@@@@@@@@');*/
+    const idQuestion = res.body.questions[0].id;
+    const idQuestion2 = res.body.questions[1].id;
+    const idQuestion3 = res.body.questions[2].id;
+    const idQuestion4 = res.body.questions[3].id;
+    const idQuestion5 = res.body.questions[4].id;
+
+    const dataSource = await app.resolve(DataSource);
+    const result = await dataSource.query(
+      `
      select *
      from public."question" q
      where q.id = $1
      `,
-       [idQuestion],
-     );
- 
-     answer1 = result[0].correctAnswers.slice(0, 1);
-     /!*console.log('-------------------------------------');
-     console.log(result);
-     console.log('-------------------------------------');*!/
- 
-     ////////////////////////////////////////////////
- 
-     const result2 = await dataSource.query(
-       `
+      [idQuestion],
+    );
+
+    answer1 = result[0].correctAnswers.slice(0, 1);
+    /*console.log('-------------------------------------');
+    console.log(result);
+    console.log('-------------------------------------');*/
+
+    ////////////////////////////////////////////////
+
+    const result2 = await dataSource.query(
+      `
      select *
      from public."question" q
      where q.id = $1
      `,
-       [idQuestion2],
-     );
- 
-     answer2 = result2[0].correctAnswers.slice(0, 1);
-     /!* console.log('-------------------------------------');
-     console.log(result);
-     console.log('-------------------------------------');*!/
- 
-     ////////////////////////////////////////////////
- 
-     const result3 = await dataSource.query(
-       `
+      [idQuestion2],
+    );
+
+    answer2 = result2[0].correctAnswers.slice(0, 1);
+    /* console.log('-------------------------------------');
+    console.log(result);
+    console.log('-------------------------------------');*/
+
+    ////////////////////////////////////////////////
+
+    const result3 = await dataSource.query(
+      `
      select *
      from public."question" q
      where q.id = $1
      `,
-       [idQuestion3],
-     );
- 
-     answer3 = result3[0].correctAnswers.slice(0, 1);
-     /!* console.log('-------------------------------------');
-     console.log(result);
-     console.log('-------------------------------------');*!/
- 
-     ////////////////////////////////////////////////
- 
-     const result4 = await dataSource.query(
-       `
+      [idQuestion3],
+    );
+
+    answer3 = result3[0].correctAnswers.slice(0, 1);
+    /* console.log('-------------------------------------');
+    console.log(result);
+    console.log('-------------------------------------');*/
+
+    ////////////////////////////////////////////////
+
+    const result4 = await dataSource.query(
+      `
      select *
      from public."question" q
      where q.id = $1
      `,
-       [idQuestion4],
-     );
- 
-     answer4 = result4[0].correctAnswers.slice(0, 1);
-     /!* console.log('-------------------------------------');
-     console.log(result);
-     console.log('-------------------------------------');*!/
- 
-     ////////////////////////////////////////////////
- 
-     const result5 = await dataSource.query(
-       `
+      [idQuestion4],
+    );
+
+    answer4 = result4[0].correctAnswers.slice(0, 1);
+    /* console.log('-------------------------------------');
+    console.log(result);
+    console.log('-------------------------------------');*/
+
+    ////////////////////////////////////////////////
+
+    const result5 = await dataSource.query(
+      `
      select *
      from public."question" q
      where q.id = $1
      `,
-       [idQuestion5],
-     );
- 
-     answer5 = result5[0].correctAnswers.slice(0, 1);
-     /!* console.log('-------------------------------------');
-     console.log(result);
-     console.log('-------------------------------------');*!/
-   });*/
+      [idQuestion5],
+    );
+
+    answer5 = result5[0].correctAnswers.slice(0, 1);
+    /* console.log('-------------------------------------');
+    console.log(result);
+    console.log('-------------------------------------');*/
+  });
 
   /////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////
@@ -526,94 +526,94 @@ describe('tests for andpoint users', () => {
   ///////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////
 
-  /* it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken1}`)
-       .send({ answer: answer11 })
-       .expect(200);
-     //console.log(res.body);
-   });
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken1}`)
-       .send({ answer: answer22 })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken1}`)
-       .send({ answer: answer33 })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken1}`)
-       .send({ answer: answer44 })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken1}`)
-       .send({ answer: answer55 })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken2}`)
-       .send({ answer: answer1 })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken2}`)
-       .send({ answer: answer2 })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken2}`)
-       .send({ answer: answer3 })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken2}`)
-       .send({ answer: answer4 })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken2}`)
-       .send({ answer: answer5 })
-       .expect(200);
-     //console.log(res.body);
-   });*/
+  it('set answer', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken1}`)
+      .send({ answer: answer11 })
+      .expect(200);
+    //console.log(res.body);
+  });
+  it('set answer', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken1}`)
+      .send({ answer: answer22 })
+      .expect(200);
+    //console.log(res.body);
+  });
+
+  it('set answer', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken1}`)
+      .send({ answer: answer33 })
+      .expect(200);
+    //console.log(res.body);
+  });
+
+  it('set answer', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken1}`)
+      .send({ answer: answer44 })
+      .expect(200);
+    //console.log(res.body);
+  });
+
+  it('set answer', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken1}`)
+      .send({ answer: answer55 })
+      .expect(200);
+    //console.log(res.body);
+  });
+
+  it('set answer', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken2}`)
+      .send({ answer: answer1 })
+      .expect(200);
+    //console.log(res.body);
+  });
+
+  it('set answer', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken2}`)
+      .send({ answer: answer2 })
+      .expect(200);
+    //console.log(res.body);
+  });
+
+  it('set answer', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken2}`)
+      .send({ answer: answer3 })
+      .expect(200);
+    //console.log(res.body);
+  });
+
+  it('set answer', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken2}`)
+      .send({ answer: answer4 })
+      .expect(200);
+    //console.log(res.body);
+  });
+
+  it('set answer', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken2}`)
+      .send({ answer: answer5 })
+      .expect(200);
+    //console.log(res.body);
+  });
 
   it('get game by id', async () => {
     const res = await request(app.getHttpServer())

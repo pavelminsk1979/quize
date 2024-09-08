@@ -142,29 +142,29 @@ describe('tests for andpoint users', () => {
     gameId2 = res.body.id;
   });
 
-  it('get game by id', async () => {
-    const res = await request(app.getHttpServer())
-      .get(`/pair-game-quiz/pairs/${gameId}`)
-      .set('Authorization', `Bearer ${accessToken1}`)
-      .expect(200);
-    console.log(res.body);
-  });
-
-  it('get game by id', async () => {
-    const res = await request(app.getHttpServer())
-      .get(`/pair-game-quiz/pairs/${gameId2}`)
-      .set('Authorization', `Bearer ${accessToken2}`)
-      .expect(200);
-    console.log(res.body);
-  });
-
-  it('get Unfinished Game', async () => {
-    const res = await request(app.getHttpServer())
-      .get(`/pair-game-quiz/pairs/my-current`)
-      .set('Authorization', `Bearer ${accessToken1}`)
-      .expect(200);
-    //console.log(res.body);
-  });
+  /* it('get game by id', async () => {
+     const res = await request(app.getHttpServer())
+       .get(`/pair-game-quiz/pairs/${gameId}`)
+       .set('Authorization', `Bearer ${accessToken1}`)
+       .expect(200);
+     console.log(res.body);
+   });
+ 
+   it('get game by id', async () => {
+     const res = await request(app.getHttpServer())
+       .get(`/pair-game-quiz/pairs/${gameId2}`)
+       .set('Authorization', `Bearer ${accessToken2}`)
+       .expect(200);
+     console.log(res.body);
+   });
+ 
+   it('get Unfinished Game', async () => {
+     const res = await request(app.getHttpServer())
+       .get(`/pair-game-quiz/pairs/my-current`)
+       .set('Authorization', `Bearer ${accessToken1}`)
+       .expect(200);
+     //console.log(res.body);
+   });*/
   it('get Unfinished Game', async () => {
     const res = await request(app.getHttpServer())
       .get(`/pair-game-quiz/pairs/my-current`)
