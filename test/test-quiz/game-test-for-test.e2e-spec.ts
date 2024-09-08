@@ -615,19 +615,28 @@ describe('tests for andpoint users', () => {
     //console.log(res.body);
   });
 
+  it('get Unfinished Game', async () => {
+    const res = await request(app.getHttpServer())
+      .get(`/pair-game-quiz/pairs/my-current`)
+      .set('Authorization', `Bearer ${accessToken1}`)
+      .expect(404);
+    console.log(res.body);
+  });
+
+  it('get game by id', async () => {
+    const inCorrectGameId = '602afe92-7d97-4395-b1b9-6cf98b351bbe';
+    const res = await request(app.getHttpServer())
+      .get(`/pair-game-quiz/pairs/${inCorrectGameId}`)
+      .set('Authorization', `Bearer ${accessToken1}`)
+      .expect(404);
+    console.log(res.body);
+  });
+
   it('get game by id', async () => {
     const res = await request(app.getHttpServer())
       .get(`/pair-game-quiz/pairs/${gameId}`)
       .set('Authorization', `Bearer ${accessToken1}`)
       .expect(200);
     console.log(res.body);
-  });
-
-  it('get Unfinished Game', async () => {
-    await request(app.getHttpServer())
-      .get('/pair-game-quiz/pairs/my-current')
-      .set('Authorization', `Bearer ${accessToken1}`)
-      .expect(404);
-    //console.log(res.body);
   });
 });
