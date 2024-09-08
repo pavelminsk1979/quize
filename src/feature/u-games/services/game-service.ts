@@ -67,35 +67,30 @@ export class GameService {
 
     const gameId = rowWithStatusActiveFromConnectionTabl.idGameFK;
 
+    /*  имея АЙДИШКУИГРЫ - я имею два игрока и дальше в общем методе
+      найду кто из них первый, и создам вьюМОДЕЛ для фронтенда */
+
+    return this.commonMethod(gameId);
+
+    ////////////////////////////////////////////
+    /*  gyuotouuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu
+      gfffffffffffffffffffjkjjjjjjjjjjjjjjjjjjjjjj
+      hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh*/
     /* получу айдишку второго игрока
      --сначала по gameId из таблицы ConnectionTabl 
      получу ПАРУ ИГРОКОВ
      --- потом найду айдишку второго */
 
-    const twoPlayers =
-      await this.connectionRepository.findTwoRowForCorrectGameByGameId(gameId);
-
-    const twoIdUsers = twoPlayers.map((el) => el.idUserFK);
-
-    return this.commonMethod(userId, gameId, twoIdUsers);
+    /*  const twoPlayers =
+        await this.connectionRepository.findTwoRowForCorrectGameByGameId(gameId);
+  
+      const twoIdUsers = twoPlayers.map((el) => el.idUserFK);
+  
+      return this.commonMethod(userId, gameId, twoIdUsers);*/
   }
 
   async getGameById(userId: string, gameId: string) {
-    /* надо по АЙДИшкеИГРЫ взять ПАРУ игроков из
-     таблицы ConnectionTabl*/
-
-    const twoPlayers =
-      await this.connectionRepository.findTwoRowForCorrectGameByGameId(gameId);
-
-    const twoIdUsers = twoPlayers.map((el) => el.idUserFK);
-
-    const isPlayCurrentUser = twoIdUsers.find((el) => el === userId);
-
-    if (!isPlayCurrentUser) {
-      throw new ForbiddenException(
-        'user not play in current game...file:game-service...  method:getGameById',
-      );
-    }
+    //есть ли такая игра
 
     const game: Game | null = await this.gameRepository.getGameById(gameId);
 
@@ -104,36 +99,72 @@ export class GameService {
         'game not found...file:game-service...  method:getGameById',
       );
     }
+    /* надо по АЙДИшкеИГРЫ взять игроков из
+     таблицы ConnectionTabl   ИХ  ИЛИ ОДИН ИЛИ ДВА */
 
-    return this.commonMethod(userId, gameId, twoIdUsers);
-  }
+    const arrayPlayers =
+      await this.connectionRepository.findTwoRowForCorrectGameByGameId(gameId);
 
-  async commonMethod(userId: string, gameId: string, twoIdUsers: string[]) {
-    const secondUserId = twoIdUsers.find((el) => el !== userId);
+    const arrayUsersId = arrayPlayers.map((el) => el.idUserFK);
 
-    if (!secondUserId) {
-      const rowUser = await this.userSqlTypeormRepository.getUserById(userId);
-      if (!rowUser) {
-        throw new NotFoundException(
-          'rowUser not found...file:game-service...  method:getGameById',
-        );
-      }
+    /*текущий юзер если не учасник этой игры
+тогда вернуть 403  --он не может чужие 
+игры запрашивать */
 
-      const rowConnectionTabl =
-        await this.connectionRepository.findRowByUseridAndGameId(
-          userId,
-          gameId,
-        );
+    const currentUser = arrayUsersId.find((el) => el === userId);
 
-      if (!rowConnectionTabl) {
-        throw new NotFoundException(
-          'rowConnectionTabl not found...file:game-service...  method:getGameById',
-        );
-      }
-
-      return this.viewOnePlayer(gameId, rowUser, rowConnectionTabl.createdAt);
+    if (!currentUser) {
+      throw new ForbiddenException(
+        'user not play in current game...file:game-service...  method:getGameById',
+      );
+    }
+    //если один игрок в игре
+    const user = await this.userSqlTypeormRepository.getUserById(userId);
+    if (!user) {
+      throw new NotFoundException();
     }
 
+    if (arrayPlayers.length === 1) {
+      return this.viewOnePlayer(gameId, user, arrayPlayers[0].createdAt);
+    }
+
+    //если   2 игрока в игре
+
+    return this.commonMethod(gameId);
+  }
+
+  async commonMethod(gameId: string) {
+    /* по gameId  достану двух юзеров которые 
+     уже играют*/
+
+    const arrayUsers =
+      await this.connectionRepository.findTwoRowForCorrectGameByGameId(gameId);
+
+    /* разобратся ОСНОВЫВАЯСЬ НА ДАТЕ СОЗДАНИЯ
+     кто первый создан а кто второй --ИБО ЭТО ВАЖНО
+     КОГДА ОТДАЮ ВЬЮМОДЕЛЬ в ней первый игрок и вторй и
+     дата создания пары(первый игрок) и дата
+     начала игры(второй игрок)
+     ----в таблице ConnectionTabl есть даты - их надо
+      сравнить и кто больше  - тот новее-тобиш
+      второй юзер 
+     */
+
+    const data1 = new Date(arrayUsers[0].createdAt);
+    const data2 = new Date(arrayUsers[1].createdAt);
+
+    let rowConnectionTab1: ConnectionTabl;
+    let rowConnectionTab2: ConnectionTabl;
+
+    if (data1 > data2) {
+      rowConnectionTab2 = arrayUsers[0];
+      rowConnectionTab1 = arrayUsers[1];
+    } else {
+      rowConnectionTab2 = arrayUsers[1];
+      rowConnectionTab1 = arrayUsers[0];
+    }
+
+    return { rowConnectionTab1, rowConnectionTab2 };
     /*есть две айдишки userId и secondUserId
      * и надо разобратся ОСНОВЫВАЯСЬ НА ДАТЕ СОЗДАНИЯ
      * кто первый создан а кто второй --ИБО ЭТО ВАЖНО
@@ -143,178 +174,212 @@ export class GameService {
      * ----в таблице ConnectionTabl есть даты - их надо
      * сравнить и кто старая - тот первый*/
 
-    /*    есть две айдишки userId и secondUserId - сделаю
-         для каждого игрока запрос в таблицу Answers
-        и создам ответ вида     answers: [
-          {
-            questionId: 1,
-            answerStatus: 1,
-            addedAt: 1,
-          },
-        ],*/
-
-    const answersFirstUser =
-      await this.answerRepository.getAnswersByUserId(userId);
-
-    const viewAnswers1 = answersFirstUser.map((el) => {
-      return {
-        questionId: el.idQuestion,
-        answerStatus: el.answerStatus,
-        addedAt: el.createdAt,
-      };
-    });
-
-    const answersSecondUser =
-      await this.answerRepository.getAnswersByUserId(secondUserId);
-
-    const viewAnswers2 = answersSecondUser.map((el) => {
-      return {
-        questionId: el.idQuestion,
-        answerStatus: el.answerStatus,
-        addedAt: el.createdAt,
-      };
-    });
-
-    /*найду количество баллов для обоих игроков
-    также нахожу БОНУС в таблице ConnectionTabl*/
-
-    const score1 =
-      await this.answerRepository.amountCorrectAnswersFromCurrentUser(userId);
-
-    const rowConnectionTabl1 =
-      await this.connectionRepository.findRowByUseridAndGameId(userId, gameId);
-    if (!rowConnectionTabl1) {
-      throw new NotFoundException(
-        'rowConnectionTabl not found...file:game-service...  method:getGameById',
-      );
-    }
-    let bonus1 = 0;
-    if (rowConnectionTabl1.bonus === 'ok') {
-      bonus1 = 1;
-    }
-
-    const resScore1 = score1 + bonus1;
-
-    const score2 =
-      await this.answerRepository.amountCorrectAnswersFromCurrentUser(
-        secondUserId,
-      );
-
-    const rowConnectionTabl2 =
-      await this.connectionRepository.findRowByUseridAndGameId(
-        secondUserId,
-        gameId,
-      );
-    if (!rowConnectionTabl2) {
-      throw new NotFoundException(
-        'rowConnectionTabl2 not found...file:game-service...  method:getGameById',
-      );
-    }
-    let bonus2 = 0;
-    if (rowConnectionTabl2.bonus === 'ok') {
-      bonus2 = 1;
-    }
-
-    const resScore2 = score2 + bonus2;
-
-    /*   найду ЛОГИНЫ игроков из таблицы Usertyp
-       чтобы создать viewPlayer -  player: {
-         id: 1,
-           login: 1,
-       },*/
-    const player1 = await this.userSqlTypeormRepository.getUserById(userId);
-
-    if (!player1) {
-      throw new NotFoundException(
-        'player1 not found...file:game-service...  method:getGameById',
-      );
-    }
-
-    const viewPlayer1 = { id: userId, login: player1.login };
-
-    const player2 =
-      await this.userSqlTypeormRepository.getUserById(secondUserId);
-
-    if (!player2) {
-      throw new NotFoundException(
-        'player2 not found...file:game-service...  method:getGameById',
-      );
-    }
-
-    const viewPlayer2 = { id: secondUserId, login: player2.login };
-
-    /*   надо взять вопросы по aИДИГРЫ и создать структуру
-       questions: [
-        {id: string;body: string;},
-       ],*/
-
-    const questionForGame =
-      await this.randomQuestionRepository.getQuestionsForGame(gameId);
-
-    const viewQuestions = questionForGame.map((el) => {
-      return {
-        id: el.idQuestionFK,
-        body: el.question.body,
-      };
-    });
-
-    /*  по ГЕЙМАЙДИ в таблице  ConnectionTabl  возму значения к
-     status: 1,
-       pairCreatedDate: 1,
-       startGameDate: 1,
-       -- значение в поле createdAt для юзера который
-     первым создал игру-ТОЕСТЬ ДАТА БОЛЕЕ СТАРАЯ
-     это будет pairCreatedDate
-     --- а когда второй вошол - ЭТО БОЛЕЕ
-     СВЕЖАЯ ДАТА И ЭТО startGameDate*/
-
-    const rowConnectionTabl =
-      await this.connectionRepository.getTwoRowForCorrectGameByGameId(gameId);
-
-    const status = rowConnectionTabl[0].status;
-
-    /* ---  первый в списке  это к паре - он игру создал
-     --второй в списке -- создал пару иждет игрока еще одного*/
-
-    const startGameDate = rowConnectionTabl[0].createdAt;
-
-    const pairCreatedDate = rowConnectionTabl[1].createdAt;
-
-    /*по ГЕЙМАЙДИ  из таблицы  Game   достану запись и в ней
-    finishGameDate дата  завершения игры
-     */
-
-    const rowGame = await this.gameRepository.getGameById(gameId);
-
-    if (!rowGame) {
-      throw new NotFoundException(
-        'rowGame not found...file:game-service...  method:getGameById',
-      );
-    }
-
-    const finishGameDate = rowGame.finishGameDate;
-
-    return {
-      id: gameId,
-      firstPlayerProgress: {
-        answers: viewAnswers1,
-
-        player: viewPlayer1,
-        score: resScore1,
-      },
-      secondPlayerProgress: {
-        answers: viewAnswers2,
-
-        player: viewPlayer2,
-        score: resScore2,
-      },
-
-      questions: viewQuestions,
-      status,
-      pairCreatedDate,
-      startGameDate,
-      finishGameDate,
-    };
+    /* const secondUserId = twoIdUsers.find((el) => el !== userId);
+ 
+     if (!secondUserId) {
+       const rowUser = await this.userSqlTypeormRepository.getUserById(userId);
+       if (!rowUser) {
+         throw new NotFoundException(
+           'rowUser not found...file:game-service...  method:getGameById',
+         );
+       }
+ 
+       const rowConnectionTabl =
+         await this.connectionRepository.findRowByUseridAndGameId(
+           userId,
+           gameId,
+         );
+ 
+       if (!rowConnectionTabl) {
+         throw new NotFoundException(
+           'rowConnectionTabl not found...file:game-service...  method:getGameById',
+         );
+       }
+ 
+       return this.viewOnePlayer(gameId, rowUser, rowConnectionTabl.createdAt);
+     }
+ 
+     /!*есть две айдишки userId и secondUserId
+      * и надо разобратся ОСНОВЫВАЯСЬ НА ДАТЕ СОЗДАНИЯ
+      * кто первый создан а кто второй --ИБО ЭТО ВАЖНО
+      * КОГДА ОТДАЮ ВЬЮМОДЕЛЬ в ней первый игрок и вторй и
+      * дата создания пары(первый игрок) и дата
+      * начала игры(второй игрок)
+      * ----в таблице ConnectionTabl есть даты - их надо
+      * сравнить и кто старая - тот первый*!/
+ 
+     /!*    есть две айдишки userId и secondUserId - сделаю
+          для каждого игрока запрос в таблицу Answers
+         и создам ответ вида     answers: [
+           {
+             questionId: 1,
+             answerStatus: 1,
+             addedAt: 1,
+           },
+         ],*!/
+ 
+     const answersFirstUser =
+       await this.answerRepository.getAnswersByUserId(userId);
+ 
+     const viewAnswers1 = answersFirstUser.map((el) => {
+       return {
+         questionId: el.idQuestion,
+         answerStatus: el.answerStatus,
+         addedAt: el.createdAt,
+       };
+     });
+ 
+     const answersSecondUser =
+       await this.answerRepository.getAnswersByUserId(secondUserId);
+ 
+     const viewAnswers2 = answersSecondUser.map((el) => {
+       return {
+         questionId: el.idQuestion,
+         answerStatus: el.answerStatus,
+         addedAt: el.createdAt,
+       };
+     });
+ 
+     /!*найду количество баллов для обоих игроков
+     также нахожу БОНУС в таблице ConnectionTabl*!/
+ 
+     const score1 =
+       await this.answerRepository.amountCorrectAnswersFromCurrentUser(userId);
+ 
+     const rowConnectionTabl1 =
+       await this.connectionRepository.findRowByUseridAndGameId(userId, gameId);
+     if (!rowConnectionTabl1) {
+       throw new NotFoundException(
+         'rowConnectionTabl not found...file:game-service...  method:getGameById',
+       );
+     }
+     let bonus1 = 0;
+     if (rowConnectionTabl1.bonus === 'ok') {
+       bonus1 = 1;
+     }
+ 
+     const resScore1 = score1 + bonus1;
+ 
+     const score2 =
+       await this.answerRepository.amountCorrectAnswersFromCurrentUser(
+         secondUserId,
+       );
+ 
+     const rowConnectionTabl2 =
+       await this.connectionRepository.findRowByUseridAndGameId(
+         secondUserId,
+         gameId,
+       );
+     if (!rowConnectionTabl2) {
+       throw new NotFoundException(
+         'rowConnectionTabl2 not found...file:game-service...  method:getGameById',
+       );
+     }
+     let bonus2 = 0;
+     if (rowConnectionTabl2.bonus === 'ok') {
+       bonus2 = 1;
+     }
+ 
+     const resScore2 = score2 + bonus2;
+ 
+     /!*   найду ЛОГИНЫ игроков из таблицы Usertyp
+        чтобы создать viewPlayer -  player: {
+          id: 1,
+            login: 1,
+        },*!/
+     const player1 = await this.userSqlTypeormRepository.getUserById(userId);
+ 
+     if (!player1) {
+       throw new NotFoundException(
+         'player1 not found...file:game-service...  method:getGameById',
+       );
+     }
+ 
+     const viewPlayer1 = { id: userId, login: player1.login };
+ 
+     const player2 =
+       await this.userSqlTypeormRepository.getUserById(secondUserId);
+ 
+     if (!player2) {
+       throw new NotFoundException(
+         'player2 not found...file:game-service...  method:getGameById',
+       );
+     }
+ 
+     const viewPlayer2 = { id: secondUserId, login: player2.login };
+ 
+     /!*   надо взять вопросы по aИДИГРЫ и создать структуру
+        questions: [
+         {id: string;body: string;},
+        ],*!/
+ 
+     const questionForGame =
+       await this.randomQuestionRepository.getQuestionsForGame(gameId);
+ 
+     const viewQuestions = questionForGame.map((el) => {
+       return {
+         id: el.idQuestionFK,
+         body: el.question.body,
+       };
+     });
+ 
+     /!*  по ГЕЙМАЙДИ в таблице  ConnectionTabl  возму значения к
+      status: 1,
+        pairCreatedDate: 1,
+        startGameDate: 1,
+        -- значение в поле createdAt для юзера который
+      первым создал игру-ТОЕСТЬ ДАТА БОЛЕЕ СТАРАЯ
+      это будет pairCreatedDate
+      --- а когда второй вошол - ЭТО БОЛЕЕ
+      СВЕЖАЯ ДАТА И ЭТО startGameDate*!/
+ 
+     const rowConnectionTabl =
+       await this.connectionRepository.getTwoRowForCorrectGameByGameId(gameId);
+ 
+     const status = rowConnectionTabl[0].status;
+ 
+     /!* ---  первый в списке  это к паре - он игру создал
+      --второй в списке -- создал пару иждет игрока еще одного*!/
+ 
+     const startGameDate = rowConnectionTabl[0].createdAt;
+ 
+     const pairCreatedDate = rowConnectionTabl[1].createdAt;
+ 
+     /!*по ГЕЙМАЙДИ  из таблицы  Game   достану запись и в ней
+     finishGameDate дата  завершения игры
+      *!/
+ 
+     const rowGame = await this.gameRepository.getGameById(gameId);
+ 
+     if (!rowGame) {
+       throw new NotFoundException(
+         'rowGame not found...file:game-service...  method:getGameById',
+       );
+     }
+ 
+     const finishGameDate = rowGame.finishGameDate;
+ 
+     return {
+       id: gameId,
+       firstPlayerProgress: {
+         answers: viewAnswers1,
+ 
+         player: viewPlayer1,
+         score: resScore1,
+       },
+       secondPlayerProgress: {
+         answers: viewAnswers2,
+ 
+         player: viewPlayer2,
+         score: resScore2,
+       },
+ 
+       questions: viewQuestions,
+       status,
+       pairCreatedDate,
+       startGameDate,
+       finishGameDate,
+     };*/
   }
 
   ///////////////////////////////////////////////////////////////

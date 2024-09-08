@@ -3,8 +3,6 @@ import { AppModule } from '../../src/app.module';
 import { applyAppSettings } from '../../src/settings/apply-app-settings';
 import request from 'supertest';
 import cookieParser from 'cookie-parser';
-import { DataSource } from 'typeorm';
-import { Usertyp } from '../../src/feature/users/domains/usertyp.entity';
 
 describe('tests for andpoint users', () => {
   let app;
@@ -170,6 +168,6 @@ describe('tests for andpoint users', () => {
       .get(`/pair-game-quiz/pairs/my-current`)
       .set('Authorization', `Bearer ${accessToken2}`)
       .expect(200);
-    //console.log(res.body);
+    console.log(res.body);
   });
 });
