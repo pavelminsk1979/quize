@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Post,
   Req,
   UseGuards,
@@ -14,6 +15,7 @@ import { AuthTokenGuard } from '../../../common/guard/auth-token-guard';
 import { Request } from 'express';
 import { GameService } from '../services/game-service';
 import { AnswerInputModel } from './pipes/answer-input-model';
+import { ValidUUIDGuard } from '../../../common/guard/exist-game-guard';
 
 @Controller('pair-game-quiz/pairs')
 export class GameController {
@@ -83,16 +85,21 @@ export class GameController {
     return game;
   }
 
-  @UseGuards(AuthTokenGuard)
+  @UseGuards(AuthTokenGuard, ValidUUIDGuard)
   @HttpCode(HttpStatus.OK)
   @Get(':id')
-  async getGameById(@Param('id') gameId: string, @Req() request: Request) {
+  async getGameById(
+    /*ParseIntPipe - это middleware в Nest.js
+    Если значение параметра id не может быть преобразовано в число, будет выброшена ошибка 400 Bad Request*/
+    @Param('id', ParseIntPipe) gameId: number,
+    @Req() request: Request,
+  ) {
     // когда AccessToken проверяю в AuthTokenGuard - тогда
     // из него достаю userId и помещаю ее в request
-
+    console.log(gameId, ' gameId');
     const userId = request['userId'];
 
-    const game = await this.gameService.getGameById(userId, gameId);
+    const game = await this.gameService.getGameById(userId, gameId.toString());
 
     return game;
   }

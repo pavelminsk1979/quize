@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -38,7 +37,7 @@ export class GameService {
   async getUnfinishedGame(userId: string) {
     /*если для текущего юзера нет пары
     - вернуть 404  */
-    debugger;
+
     const rowWithStatusActiveFromConnectionTabl: ConnectionTabl | null =
       await this.connectionRepository.findRowActiveByUserId(userId);
 
@@ -64,20 +63,6 @@ export class GameService {
   }
 
   async getGameById(userId: string, gameId: string) {
-    //невалидная айдишка
-    if (gameId.length > 5) {
-      throw new BadRequestException(
-        'id invalid...file:game-service...  method:getGameById',
-      );
-    }
-    const game: Game | null = await this.gameRepository.getGameById(gameId);
-
-    if (!game) {
-      throw new NotFoundException(
-        'game not found...file:game-service...  method:getGameById',
-      );
-    }
-
     /* надо по АЙДИшкеИГРЫ взять ПАРУ игроков из
      таблицы ConnectionTabl*/
 
@@ -93,6 +78,15 @@ export class GameService {
         'user not play in current game...file:game-service...  method:getGameById',
       );
     }
+
+    const game: Game | null = await this.gameRepository.getGameById(gameId);
+
+    if (!game) {
+      throw new NotFoundException(
+        'game not found...file:game-service...  method:getGameById',
+      );
+    }
+
     return this.commonMethod(userId, gameId, twoIdUsers);
   }
 

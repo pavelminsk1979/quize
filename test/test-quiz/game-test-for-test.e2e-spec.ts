@@ -628,6 +628,11 @@ describe('tests for andpoint users', () => {
     const res = await request(app.getHttpServer())
       .get(`/pair-game-quiz/pairs/${inCorrectGameId}`)
       .set('Authorization', `Bearer ${accessToken1}`)
+      .expect(400);
+
+    await request(app.getHttpServer())
+      .get(`/pair-game-quiz/pairs/${12345}`)
+      .set('Authorization', `Bearer ${accessToken1}`)
       .expect(404);
     console.log(res.body);
   });
