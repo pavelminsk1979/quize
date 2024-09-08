@@ -96,7 +96,7 @@ export class GameController {
   ) {
     // когда AccessToken проверяю в AuthTokenGuard - тогда
     // из него достаю userId и помещаю ее в request
-    console.log(gameId, ' gameId');
+
     const userId = request['userId'];
 
     const game = await this.gameService.getGameById(userId, gameId.toString());

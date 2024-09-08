@@ -37,7 +37,7 @@ export class GameService {
   async getUnfinishedGame(userId: string) {
     /*если для текущего юзера нет пары
     - вернуть 404  */
-
+    debugger;
     const rowWithStatusActiveFromConnectionTabl: ConnectionTabl | null =
       await this.connectionRepository.findRowActiveByUserId(userId);
 
@@ -94,9 +94,41 @@ export class GameService {
     const secondUserId = twoIdUsers.find((el) => el !== userId);
 
     if (!secondUserId) {
-      throw new NotFoundException(
-        'secondUserId not found...file:game-service...  method:getGameById',
-      );
+      const rowUser = await this.userSqlTypeormRepository.getUserById(userId);
+      if (!rowUser) {
+        throw new NotFoundException(
+          'rowUser not found...file:game-service...  method:getGameById',
+        );
+      }
+
+      const rowConnectionTabl =
+        await this.connectionRepository.findRowByUseridAndGameId(
+          userId,
+          gameId,
+        );
+
+      if (!rowConnectionTabl) {
+        throw new NotFoundException(
+          'rowConnectionTabl not found...file:game-service...  method:getGameById',
+        );
+      }
+      return {
+        id: gameId,
+        firstPlayerProgress: {
+          answers: [],
+          player: {
+            id: userId,
+            login: rowUser.login,
+          },
+          score: 0,
+        },
+        pairCreatedDate: rowConnectionTabl.createdAt,
+        questions: null,
+        secondPlayerProgress: null,
+        startGameDate: null,
+        status: 'PendingSecondPlayer',
+        finishGameDate: null,
+      };
     }
 
     /*    есть две айдишки userId и secondUserId - сделаю
@@ -633,15 +665,17 @@ export class GameService {
         firstPlayerProgress: {
           answers: [],
           player: {
-            id: user.id,
+            id: userId,
             login: user.login,
           },
           score: 0,
         },
-        secondPlayerProgress: null,
-        questions: viewQuestions,
-        status: GameStatus.PANDING,
         pairCreatedDate: pairCreatedDate,
+        questions: null,
+        secondPlayerProgress: null,
+        startGameDate: null,
+        status: 'PendingSecondPlayer',
+        finishGameDate: null,
       };
     }
 
