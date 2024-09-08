@@ -118,7 +118,7 @@ describe('tests for andpoint users', () => {
     const res = await request(app.getHttpServer())
       .get('/pair-game-quiz/pairs/my-current')
       .set('Authorization', `Bearer ${accessToken1}`)
-      .expect(404);
+      .expect(200);
     console.log(res.body);
   });
 });

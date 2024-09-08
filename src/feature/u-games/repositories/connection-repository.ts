@@ -11,6 +11,21 @@ export class ConnectionRepository {
     private readonly connectionRepository: Repository<ConnectionTabl>,
   ) {}
 
+  async findRowPandingByUserId(userId: string) {
+    const result = await this.connectionRepository
+      .createQueryBuilder('c')
+      .where('c.status = :status AND c.idUserFK= :userId', {
+        status: GameStatus.PANDING,
+        userId,
+      })
+      .getOne();
+
+    /* запрос  будет возвращать либо
+  объект - запись из таблицы ConnectionTabl, либо null*/
+
+    return result;
+  }
+
   async findRowByUseridAndGameId(userId: string, gameId: string) {
     const result = await this.connectionRepository
       .createQueryBuilder('c')

@@ -37,14 +37,42 @@ export class GameService {
   async getUnfinishedGame(userId: string) {
     /*если для текущего юзера нет пары
     - вернуть 404  */
-    debugger;
+
     const rowWithStatusActiveFromConnectionTabl: ConnectionTabl | null =
       await this.connectionRepository.findRowActiveByUserId(userId);
 
     if (!rowWithStatusActiveFromConnectionTabl) {
-      throw new NotFoundException(
-        'rowWithStatusActiveFromConnectionTabl not found...file:game-service...  method:getUnfinishedGame',
-      );
+      const rowWithStatusPandingFromConnectionTabl: ConnectionTabl | null =
+        await this.connectionRepository.findRowPandingByUserId(userId);
+
+      if (!rowWithStatusPandingFromConnectionTabl) {
+        throw new NotFoundException(
+          'rowWithStatusActiveFromConnectionTabl not found...file:game-service...  method:getUnfinishedGame',
+        );
+      }
+
+      const rowUser = await this.userSqlTypeormRepository.getUserById(userId);
+
+      if (!rowUser) {
+        throw new NotFoundException();
+      }
+      return {
+        id: rowWithStatusPandingFromConnectionTabl.idGameFK,
+        firstPlayerProgress: {
+          answers: [],
+          player: {
+            id: userId,
+            login: rowUser.login,
+          },
+          score: 0,
+        },
+        pairCreatedDate: rowWithStatusPandingFromConnectionTabl.createdAt,
+        questions: null,
+        secondPlayerProgress: null,
+        startGameDate: null,
+        status: 'PendingSecondPlayer',
+        finishGameDate: null,
+      };
     }
 
     const gameId = rowWithStatusActiveFromConnectionTabl.idGameFK;
