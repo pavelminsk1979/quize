@@ -86,6 +86,7 @@ export class GameController {
   @HttpCode(HttpStatus.OK)
   @Get('my-current')
   async getUnfinishedGame(@Req() request: Request) {
+    debugger;
     // когда AccessToken проверяю в AuthTokenGuard - тогда
     // из него достаю userId и помещаю ее в request
 

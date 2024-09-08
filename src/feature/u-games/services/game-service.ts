@@ -37,8 +37,8 @@ export class GameService {
 
   async getUnfinishedGame(userId: string) {
     /*если для текущего юзера нет пары
-    - вернуть 404*/
-
+    - вернуть 404  */
+    debugger;
     const rowWithStatusActiveFromConnectionTabl: ConnectionTabl | null =
       await this.connectionRepository.findRowActiveByUserId(userId);
 
@@ -64,6 +64,7 @@ export class GameService {
   }
 
   async getGameById(userId: string, gameId: string) {
+    //невалидная айдишка
     if (gameId.length > 5) {
       throw new BadRequestException(
         'id invalid...file:game-service...  method:getGameById',
