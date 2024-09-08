@@ -22,6 +22,7 @@ import { Question } from '../../u-questions/domains/question.entity';
 import { RandomQuestionRepository } from '../repositories/random-question-repository';
 import { AnswerRepository } from '../repositories/answer-repository';
 import { Game } from '../domains/game.entity';
+import { Usertyp } from '../../users/domains/usertyp.entity';
 
 @Injectable()
 export class GameService {
@@ -56,23 +57,11 @@ export class GameService {
       if (!rowUser) {
         throw new NotFoundException();
       }
-      return {
-        id: rowWithStatusPandingFromConnectionTabl.idGameFK,
-        firstPlayerProgress: {
-          answers: [],
-          player: {
-            id: userId,
-            login: rowUser.login,
-          },
-          score: 0,
-        },
-        pairCreatedDate: rowWithStatusPandingFromConnectionTabl.createdAt,
-        questions: null,
-        secondPlayerProgress: null,
-        startGameDate: null,
-        status: 'PendingSecondPlayer',
-        finishGameDate: null,
-      };
+      return this.viewOnePlayer(
+        rowWithStatusPandingFromConnectionTabl.idGameFK,
+        rowUser,
+        rowWithStatusPandingFromConnectionTabl.createdAt,
+      );
     }
 
     const gameId = rowWithStatusActiveFromConnectionTabl.idGameFK;
@@ -140,23 +129,8 @@ export class GameService {
           'rowConnectionTabl not found...file:game-service...  method:getGameById',
         );
       }
-      return {
-        id: gameId,
-        firstPlayerProgress: {
-          answers: [],
-          player: {
-            id: userId,
-            login: rowUser.login,
-          },
-          score: 0,
-        },
-        pairCreatedDate: rowConnectionTabl.createdAt,
-        questions: null,
-        secondPlayerProgress: null,
-        startGameDate: null,
-        status: 'PendingSecondPlayer',
-        finishGameDate: null,
-      };
+
+      return this.viewOnePlayer(gameId, rowUser, rowConnectionTabl.createdAt);
     }
 
     /*    есть две айдишки userId и secondUserId - сделаю
@@ -310,11 +284,6 @@ export class GameService {
 
     const finishGameDate = rowGame.finishGameDate;
 
-    /*    return {
-          twoIdUsers: twoIdUsers,
-          secondUserId: secondUserId,
-          userId: userId,
-        };*/
     return {
       id: gameId,
       firstPlayerProgress: {
@@ -688,23 +657,7 @@ export class GameService {
       структура ответа прописана в свагере
       типизация  - RequestFirstPlayer*/
 
-      return {
-        id: gameId,
-        firstPlayerProgress: {
-          answers: [],
-          player: {
-            id: userId,
-            login: user.login,
-          },
-          score: 0,
-        },
-        pairCreatedDate: pairCreatedDate,
-        questions: null,
-        secondPlayerProgress: null,
-        startGameDate: null,
-        status: 'PendingSecondPlayer',
-        finishGameDate: null,
-      };
+      return this.viewOnePlayer(gameId, user, pairCreatedDate);
     }
 
     ////////////////////////////////////////////////
@@ -819,6 +772,27 @@ export class GameService {
       status: GameStatus.ACTIVE,
       pairCreatedDate: player1.createdAt,
       startGameDate,
+      finishGameDate: null,
+    };
+  }
+
+  viewOnePlayer(gameId: string, user: Usertyp, pairCreatedDate: string) {
+    return {
+      id: gameId,
+      firstPlayerProgress: {
+        answers: [],
+        player: {
+          id: user.id,
+          login: user.login,
+        },
+        score: 0,
+      },
+      pairCreatedDate,
+      questions: null,
+      secondPlayerProgress: null,
+      startGameDate: null,
+      status: 'PendingSecondPlayer',
+      finishGameDate: null,
     };
   }
 }
