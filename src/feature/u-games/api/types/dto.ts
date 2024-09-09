@@ -43,13 +43,13 @@ export enum GameStatus {
 
   ACTIVE = 'Active',
 
-  FINISHED = 'Finished ',
+  FINISHED = 'Finished',
 }
 
 export enum AnswerStatus {
   CORRECT = 'Correct',
 
-  INCORRECT = 'Incorrect ',
+  INCORRECT = 'Incorrect',
 }
 
 export type RequestFirstPlayer = {
@@ -78,4 +78,10 @@ export type CreateAnswer = {
   idQuestion: string;
   answer: string;
   answerStatus: AnswerStatus;
+};
+
+export type Answer = {
+  questionId: string;
+  answerStatus: AnswerStatus;
+  addedAt: string;
 };

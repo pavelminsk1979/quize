@@ -31,7 +31,7 @@ export class GameController {
     const userId = request['userId'];
 
     const dataForGame = await this.gameService.startGame(userId);
-
+    debugger;
     if (dataForGame) {
       return dataForGame;
     } else {

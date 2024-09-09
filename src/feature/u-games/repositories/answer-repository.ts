@@ -11,13 +11,17 @@ export class AnswerRepository {
     private readonly answersRepository: Repository<Answers>,
   ) {}
 
-  async amountCorrectAnswersFromCurrentUser(userId: string) {
+  async amountCorrectAnswersFromCurrentUser(userId: string, gameId: string) {
     const result = await this.answersRepository
       .createQueryBuilder('a')
-      .where('a.idUser = :userId AND a.answerStatus= :answerStatus', {
-        userId,
-        answerStatus: AnswerStatus.CORRECT,
-      })
+      .where(
+        'a.idUser = :userId AND a.answerStatus= :answerStatus AND a.idGame = :gameId',
+        {
+          userId,
+          answerStatus: AnswerStatus.CORRECT,
+          gameId,
+        },
+      )
       .getCount();
 
     return result;
@@ -59,10 +63,10 @@ export class AnswerRepository {
     return result;
   }
 
-  async getAnswersByUserId(idUser: string) {
+  async getAnswersByUserIdAndByGameId(idUser: string, gameId: string) {
     const result = await this.answersRepository
       .createQueryBuilder('a')
-      .where('a.idUser= :idUser', { idUser })
+      .where('a.idUser= :idUser AND a.idGame= :gameId', { idUser, gameId })
       .getMany();
 
     return result;
