@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InsertResult, Repository } from 'typeorm';
 import { Game } from '../domains/game.entity';
-import { CreateGame } from '../api/types/dto';
+import { CreateGame, GameStatus } from '../api/types/dto';
 
 @Injectable()
 export class GameRepository {
@@ -10,6 +10,68 @@ export class GameRepository {
     @InjectRepository(Game)
     private readonly gameRepository: Repository<Game>,
   ) {}
+
+  async setStatusFinished(idGame: string) {
+    await this.gameRepository
+      .createQueryBuilder()
+      .update(Game)
+      .set({ status: GameStatus.FINISHED })
+      .where('idGame= :idGame', { idGame })
+      .execute();
+
+    /* result это вот такая структура
+   UpdateResult { generatedMaps: [], raw: [], affected: 0 }
+    affected-- это количество измененных саписей
+  */
+
+    /*if (result.affected === 0) return false;
+    return true;*/
+  }
+
+  async incrementScoreForPlayer1(idGame: string) {
+    await this.gameRepository
+      .createQueryBuilder()
+      .update(Game)
+      .set({
+        scorePlayer1: () => 'scorePlayer1 + 1',
+      })
+      .where('idGame = :idGame', { idGame })
+      .execute();
+  }
+
+  async incrementScoreForPlayer2(idGame: string) {
+    await this.gameRepository
+      .createQueryBuilder()
+      .update(Game)
+      .set({
+        scorePlayer2: () => 'scorePlayer2 + 1',
+      })
+      .where('idGame = :idGame', { idGame })
+      .execute();
+  }
+
+  async setStartGameDateAndIdPlayer2AndLoginPlayer2(
+    idGame: string,
+    idPlayer2: string,
+    loginPlayer2: string,
+    startGameDate: string,
+    status: GameStatus,
+  ) {
+    const result = await this.gameRepository
+      .createQueryBuilder()
+      .update(Game)
+      .set({ idPlayer2, loginPlayer2, startGameDate, status })
+      .where('idGame= :idGame', { idGame })
+      .execute();
+
+    /* result это вот такая структура
+   UpdateResult { generatedMaps: [], raw: [], affected: 0 }
+    affected-- это количество измененных саписей
+  */
+
+    if (result.affected === 0) return false;
+    return true;
+  }
 
   async setDateFinished(idGame: string, finishGameDate: string) {
     const result = await this.gameRepository
@@ -36,6 +98,15 @@ export class GameRepository {
       .values({
         createdAt: newGame.createdAt,
         finishGameDate: newGame.finishGameDate,
+        pairCreatedDate: newGame.pairCreatedDate,
+        status: newGame.status,
+        startGameDate: newGame.startGameDate,
+        idPlayer1: newGame.idPlayer1,
+        loginPlayer1: newGame.loginPlayer1,
+        idPlayer2: newGame.idPlayer2,
+        loginPlayer2: newGame.loginPlayer2,
+        scorePlayer1: newGame.scorePlayer1,
+        scorePlayer2: newGame.scorePlayer2,
       })
       .execute();
 

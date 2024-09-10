@@ -5,6 +5,15 @@ import { Question } from '../../../u-questions/domains/question.entity';
 export type CreateGame = {
   createdAt: string;
   finishGameDate: null;
+  pairCreatedDate: string;
+  status: GameStatus;
+  startGameDate: null;
+  idPlayer1: string;
+  loginPlayer1: string;
+  idPlayer2: null;
+  loginPlayer2: null;
+  scorePlayer1: number;
+  scorePlayer2: number;
 };
 
 export type Connection = {

@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Game } from '../domains/game.entity';
 import { QueryParamsGameInputModel } from '../../../common/pipes/query-params-game-input-model';
 import { SortDir } from '../../../common/types';
+import { GameStatus } from '../api/types/dto';
 
 @Injectable()
 export class GameQueryRepository {
@@ -55,55 +56,73 @@ pageSize - размер  одной страницы, ПО УМОЛЧАНИЮ 10
       sortDir = 'DESC';
     }
 
-    try {
-      const result = await this.gameRepository
-        .createQueryBuilder('g')
-        .orderBy(`g.${sortBy}`, sortDir)
-        .skip(amountSkip)
-        .take(pageSize)
-        .getManyAndCount();
-    } catch (e) {
-      console.log(e);
+    const result = await this.gameRepository
+      .createQueryBuilder('g')
+      .orderBy(`g.${sortBy}`, sortDir)
+      .skip(amountSkip)
+      .take(pageSize)
+      .getManyAndCount();
+
+    /*    result    возвращает кортеж, 
+      где первый элемент - массив объектов, удовлетворяющих
+      запросу, а второй элемент - общее количество записей
+      в базе данных, удовлетворяющих условию запроса
+      без учета операции take(pageSize) -ТОБИШЬ ВСЕ ЗАПИСИ.*/
+
+    const totalCount = result[1];
+
+    /*
+pagesCount это число
+Вычисляется общее количество страниц путем деления общего
+количества записей  на размер страницы (pageSize), и 
+округление вверх с помощью функции Math.ceil.*/
+
+    const pagesCount: number = Math.ceil(totalCount / pageSize);
+
+    if (result[0].length === 0) {
+      return {
+        pagesCount,
+        page: pageNumber,
+        pageSize: pageSize,
+        totalCount,
+        items: [],
+      };
     }
 
-    return { userId: userId };
+    //const viewItems = result[0];
+    const viewItems = result[0].map((el) => {
+      return {
+        id: el.idGame,
+        firstPlayerProgress: {
+          answers: [],
+          player: {
+            id: el.idPlayer1,
+            login: el.loginPlayer1,
+          },
+          score: el.scorePlayer1,
+        },
+        secondPlayerProgress: {
+          answers: [],
+          player: {
+            id: el.idPlayer2,
+            login: el.loginPlayer2,
+          },
+          score: el.scorePlayer2,
+        },
+        questions: 1,
+        status: el.status,
+        pairCreatedDate: el.pairCreatedDate,
+        startGameDate: el.startGameDate,
+        finishGameDate: el.finishGameDate,
+      };
+    });
 
-    /*   /!*    result    возвращает кортеж, 
-   где первый элемент - массив объектов, удовлетворяющих
-   запросу, а второй элемент - общее количество записей
-   в базе данных, удовлетворяющих условию запроса
-   без учета операции take(pageSize) -ТОБИШЬ ВСЕ ЗАПИСИ.*!/
-   
-       const totalCount = result[1];
-   
-       /!*
-   pagesCount это число
-   Вычисляется общее количество страниц путем деления общего
-   количества записей  на размер страницы (pageSize), и 
-   округление вверх с помощью функции Math.ceil.*!/
-   
-       const pagesCount: number = Math.ceil(totalCount / pageSize);
-   
-       if (result[0].length === 0) {
-         return {
-           pagesCount,
-           page: pageNumber,
-           pageSize: pageSize,
-           totalCount,
-           items: [],
-         };
-       }
-   
-       const viewItems = result[0];
-   
-       return { viewItems: viewItems };*/
+    return {
+      pagesCount,
+      page: pageNumber,
+      pageSize: pageSize,
+      totalCount,
+      items: viewItems,
+    };
   }
-
-  /*async setDateFinished(idGame: string, finishGameDate: string) {
-    const result = await this.gameRepository
-      .createQueryBuilder()
-      .update(Game)
-      .set({ finishGameDate })
-      .where('idGame= :idGame', { idGame })
-      .execute();*/
 }

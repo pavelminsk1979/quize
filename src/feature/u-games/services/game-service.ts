@@ -442,7 +442,15 @@ export class GameService {
     //запись в таблицу Answers
     await this.answerRepository.createAnswer(newAnswer);
 
-    /*ТУТ ПРО ДОПОЛНИТЕЛЬНЫЙ БАЛЛ ДЛЯ ПЕРВОГО ОТВЕТИВШЕГО
+    /*  если игрок дал верный ответ 
+      ---добавлю 1 бал в таблицу Game*/
+
+    if (answerStatus === AnswerStatus.CORRECT) {
+      await this.setScoreInTableGame(userId, idGame);
+    }
+
+    if (findResult) {
+      /*ТУТ ПРО ДОПОЛНИТЕЛЬНЫЙ БАЛЛ ДЛЯ ПЕРВОГО ОТВЕТИВШЕГО
     НА 5 ВОПРОСОВ  ЭТО ЧАСТЬ 1,   часть2 ниже далеко
      ---на каждый правильный ответ в таблице ConnectionTabl
       поле rightanswer изменяю на 'ok' даже если там уже
@@ -453,7 +461,6 @@ export class GameService {
       поле bonus изменю на 'ok'
 */
 
-    if (findResult) {
       await this.connectionRepository.updateRowRightAnswer(
         String(connectionUserId1),
       );
@@ -512,10 +519,14 @@ export class GameService {
         const dateFinishGame = new Date().toISOString();
 
         await this.gameRepository.setDateFinished(idGame, dateFinishGame);
+
+        /*  установить статус окончания игры */
+
+        await this.gameRepository.setStatusFinished(idGame);
       }
 
       /*ТУТ ПРО ДОПОЛНИТЕЛЬНЫЙ БАЛЛ ДЛЯ ПЕРВОГО ОТВЕТИВШЕГО
-      НА 5 ВОПРОСОВ  ЭТО ЧАСТЬ 2,   часть1 выше  далеко
+      НА 5 ВОПРОСОВ  ЭТО ЧАСТЬ 2,   часть1 выше 
        ---на каждый правильный ответ в таблице ConnectionTabl
         поле rightanswer изменяю на 'ok' даже если там уже
         есть это 'ok' но первоначально будет null
@@ -538,6 +549,10 @@ export class GameService {
           await this.connectionRepository.updateRowBonus(
             String(connectionUserId1),
           );
+
+          /*также добавлю бал в таблицу Game*/
+
+          await this.setScoreInTableGame(userId, idGame);
         }
       }
     }
@@ -590,9 +605,20 @@ export class GameService {
            */
 
       //создаю ИГРУ
+
+      const pairCreatedDate = new Date().toISOString();
       const newGame: CreateGame = {
-        createdAt: new Date().toISOString(),
+        createdAt: pairCreatedDate,
         finishGameDate: null,
+        startGameDate: null,
+        pairCreatedDate,
+        status: GameStatus.PANDING,
+        idPlayer1: user.id,
+        loginPlayer1: user.login,
+        idPlayer2: null,
+        loginPlayer2: null,
+        scorePlayer1: 0,
+        scorePlayer2: 0,
       };
       const gameId: string = await this.gameRepository.createGame(newGame);
 
@@ -606,9 +632,6 @@ export class GameService {
         сервер временно недоступен или перегружен*/
         throw new ServiceUnavailableException();
       }
-
-      //дата создания новой пары
-      const pairCreatedDate = new Date().toISOString();
 
       /*создаю запись
       в таблице ConnectionTabl  с status:panding*/
@@ -709,6 +732,17 @@ export class GameService {
     }
 
     const startGameDate = new Date().toISOString();
+
+    /* в таблице Game колонки созданы но их значения null
+    -- добавляю  startGameDate+idPlayer2+loginPlayer2*/
+
+    await this.gameRepository.setStartGameDateAndIdPlayer2AndLoginPlayer2(
+      rowConnectionTabl.idGameFK,
+      user.id,
+      user.login,
+      startGameDate,
+      GameStatus.ACTIVE,
+    );
 
     /*создаю запись для второго игрока
     в таблице ConnectionTabl  с status:ACTIVE*/
@@ -812,5 +846,24 @@ export class GameService {
       status: 'PendingSecondPlayer',
       finishGameDate: null,
     };
+  }
+
+  async setScoreInTableGame(userId: string, idGame: string) {
+    /*из таблицы Game получу одну запись
+ по  idGame  */
+
+    const rowGame = await this.gameRepository.getGameById(idGame);
+
+    if (!rowGame) {
+      throw new NotFoundException();
+    }
+
+    /* приходящая userId  это  idPlayer1  или  idPlayer2*/
+
+    if (userId === rowGame.idPlayer1) {
+      await this.gameRepository.incrementScoreForPlayer1(idGame);
+    } else {
+      await this.gameRepository.incrementScoreForPlayer2(idGame);
+    }
   }
 }
