@@ -8,6 +8,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -16,10 +17,15 @@ import { Request } from 'express';
 import { GameService } from '../services/game-service';
 import { AnswerInputModel } from './pipes/answer-input-model';
 import { ValidUUIDGuard } from '../../../common/guard/exist-game-guard';
+import { QueryParamsGameInputModel } from '../../../common/pipes/query-params-game-input-model';
+import { GameQueryRepository } from '../repositories/game-query-repository';
 
 @Controller('pair-game-quiz/pairs')
 export class GameController {
-  constructor(protected gameService: GameService) {}
+  constructor(
+    protected gameService: GameService,
+    protected gameQueryRepository: GameQueryRepository,
+  ) {}
 
   @UseGuards(AuthTokenGuard)
   @HttpCode(HttpStatus.OK)
@@ -31,7 +37,7 @@ export class GameController {
     const userId = request['userId'];
 
     const dataForGame = await this.gameService.startGame(userId);
-    debugger;
+
     if (dataForGame) {
       return dataForGame;
     } else {
@@ -81,6 +87,28 @@ export class GameController {
 
     const game = await this.gameService.getUnfinishedGame(userId);
     /*const game = await this.gameService.getGameById(userId, gameId);*/
+
+    return game;
+  }
+
+  /* получить ВСЕ игры и завершонные и ТЕКУЩУЮ
+ данного юзера   с  ПАГИНАЦИЕЙ И СОРТИРОВКОЙ*/
+  @UseGuards(AuthTokenGuard)
+  @HttpCode(HttpStatus.OK)
+  @Get('my')
+  async getAllGames(
+    @Query() queryParamsGameInputModel: QueryParamsGameInputModel,
+    @Req() request: Request,
+  ) {
+    // когда AccessToken проверяю в AuthTokenGuard - тогда
+    // из него достаю userId и помещаю ее в request
+
+    const userId = request['userId'];
+
+    const game = await this.gameQueryRepository.getAllGames(
+      userId,
+      queryParamsGameInputModel,
+    );
 
     return game;
   }

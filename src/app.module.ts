@@ -66,6 +66,7 @@ import { RandomQuestionRepository } from './feature/u-games/repositories/random-
 import { Answers } from './feature/u-games/domains/answers.entity';
 import { AnswerRepository } from './feature/u-games/repositories/answer-repository';
 import { ValidUUIDGuard } from './common/guard/exist-game-guard';
+import { GameQueryRepository } from './feature/u-games/repositories/game-query-repository';
 
 dotenv.config();
 
@@ -181,6 +182,7 @@ dotenv.config();
     RandomQuestionRepository,
     AnswerRepository,
     ValidUUIDGuard,
+    GameQueryRepository,
   ],
 })
 export class AppModule {}

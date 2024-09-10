@@ -856,49 +856,33 @@ describe('tests for andpoint users', () => {
     console.log('-------------------------------------');*/
   });
 
-  it('get Unfinished Game', async () => {
-    const res = await request(app.getHttpServer())
-      .get(`/pair-game-quiz/pairs/my-current`)
+  it('set answer', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
       .set('Authorization', `Bearer ${accessToken1}`)
+      .send({ answer: answer11111 })
       .expect(200);
-    console.log(res.body);
+    //console.log(res.body);
   });
 
-  /*  it('set answer', async () => {
-      await request(app.getHttpServer())
-        .post('/pair-game-quiz/pairs/my-current/answers')
-        .set('Authorization', `Bearer ${accessToken1}`)
-        .send({ answer: answer11111 })
-        .expect(200);
-      //console.log(res.body);
-    });
-  
-    it('set answer', async () => {
-      const inCorrectAnswer = '12';
-      await request(app.getHttpServer())
-        .post('/pair-game-quiz/pairs/my-current/answers')
-        .set('Authorization', `Bearer ${accessToken2}`)
-        .send({ answer: inCorrectAnswer })
-        .expect(200);
-      //console.log(res.body);
-    });
-  
-    it('set answer', async () => {
-      await request(app.getHttpServer())
-        .post('/pair-game-quiz/pairs/my-current/answers')
-        .set('Authorization', `Bearer ${accessToken2}`)
-        .send({ answer: answer22222 })
-        .expect(200);
-      //console.log(res.body);
-    });*/
+  it('set answer', async () => {
+    const inCorrectAnswer = '12';
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken2}`)
+      .send({ answer: inCorrectAnswer })
+      .expect(200);
+    //console.log(res.body);
+  });
 
-  /* it('get game by id', async () => {
-     const res = await request(app.getHttpServer())
-       .get(`/pair-game-quiz/pairs/${gameId}`)
-       .set('Authorization', `Bearer ${accessToken1}`)
-       .expect(200);
-     // console.log(res.body);
-   });*/
+  it('set answer', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken2}`)
+      .send({ answer: answer22222 })
+      .expect(200);
+    //console.log(res.body);
+  });
 
   /*  it('get Unfinished Game', async () => {
       const res = await request(app.getHttpServer())
@@ -907,4 +891,12 @@ describe('tests for andpoint users', () => {
         .expect(200);
       console.log(res.body);
     });*/
+
+  it('get all games', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/pair-game-quiz/pairs/my')
+      .set('Authorization', `Bearer ${accessToken1}`)
+      .expect(200);
+    console.log(res.body);
+  });
 });
