@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { AnswerStatus } from '../api/types/dto';
+import { Game } from './game.entity';
 
 @Entity()
 /*не создает таблицы без
@@ -26,4 +27,7 @@ export class Answers {
 
   @Column()
   public answerStatus: AnswerStatus;
+
+  @ManyToOne(() => Game, 'answers')
+  public game: Game;
 }

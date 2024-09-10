@@ -39,6 +39,7 @@ export class AnswerRepository {
         answerStatus: newAnswer.answerStatus,
         idQuestion: newAnswer.idQuestion,
         idUser: newAnswer.idUser,
+        game: newAnswer.game,
       })
       .execute();
     /*тут структура

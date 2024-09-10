@@ -2,6 +2,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ConnectionTabl } from './connection.entity';
 import { RandomQuestion } from './random-question.entity';
 import { GameStatus } from '../api/types/dto';
+import { Answers } from './answers.entity';
 
 @Entity()
 /*не создает таблицы без
@@ -49,6 +50,9 @@ export class Game {
 
   @OneToMany(() => RandomQuestion, 'game')
   public randomQuestion: RandomQuestion;
+
+  @OneToMany(() => Answers, 'game')
+  public answers: Answers;
 }
 
 //одна игра - два(много\несколько- всего два) подключения

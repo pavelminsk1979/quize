@@ -47,6 +47,7 @@ export class TestController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete('all-data')
   async deleteAllData() {
+    await this.answersRepository.delete({});
     await this.randomQuestionRepository.delete({});
     await this.questionRepository.delete({});
     await this.connectionRepository.delete({});
@@ -58,7 +59,6 @@ export class TestController {
     await this.usertypRepository.delete({});
     await this.posttypRepository.delete({});
     await this.blogtypRepository.delete({});
-    await this.answersRepository.delete({});
   }
 
   return;

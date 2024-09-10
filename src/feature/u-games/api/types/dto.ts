@@ -87,6 +87,7 @@ export type CreateAnswer = {
   idQuestion: string;
   answer: string;
   answerStatus: AnswerStatus;
+  game: Game;
 };
 
 export type Answer = {

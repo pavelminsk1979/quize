@@ -428,6 +428,12 @@ export class GameService {
 
     const addedAt = new Date().toISOString();
 
+    const game = await this.gameRepository.getGameById(idGame);
+
+    if (!game) {
+      throw new NotFoundException();
+    }
+
     /*делаю  запись в таблицу ANSWER*/
 
     const newAnswer: CreateAnswer = {
@@ -437,6 +443,7 @@ export class GameService {
       idGame,
       answerStatus,
       idQuestion: necessaryQuestion.idQuestionFK,
+      game: game,
     };
 
     //запись в таблицу Answers

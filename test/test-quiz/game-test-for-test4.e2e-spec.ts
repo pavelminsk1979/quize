@@ -897,6 +897,7 @@ describe('tests for andpoint users', () => {
       .get('/pair-game-quiz/pairs/my')
       .set('Authorization', `Bearer ${accessToken1}`)
       .expect(200);
-    console.log(res.body);
+    console.log(res.body.items[0].firstPlayerProgress);
+    //console.log(res.body[1]);
   });
 });

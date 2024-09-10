@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { Game } from '../domains/game.entity';
 import { QueryParamsGameInputModel } from '../../../common/pipes/query-params-game-input-model';
 import { SortDir } from '../../../common/types';
-import { GameStatus } from '../api/types/dto';
+import { RandomQuestion } from '../domains/random-question.entity';
 
 @Injectable()
 export class GameQueryRepository {
@@ -58,6 +58,9 @@ pageSize - размер  одной страницы, ПО УМОЛЧАНИЮ 10
 
     const result = await this.gameRepository
       .createQueryBuilder('g')
+      .leftJoinAndSelect('g.answers', 'a')
+      .leftJoinAndSelect('g.randomQuestion', 'rq')
+      .leftJoinAndSelect('rq.question', 'q')
       .orderBy(`g.${sortBy}`, sortDir)
       .skip(amountSkip)
       .take(pageSize)
@@ -89,12 +92,46 @@ pagesCount это число
       };
     }
 
-    //const viewItems = result[0];
+    //return result[0];
+    //return result[0][0].randomQuestion[0];
     const viewItems = result[0].map((el) => {
+      //@ts-ignore
+      const arrayAnswers1 = el.answers.filter(
+        (element) => element.idUser === el.idPlayer1,
+      );
+
+      //@ts-ignore
+      const arrayAnswers2 = el.answers.filter(
+        (element) => element.idUser === el.idPlayer2,
+      );
+
+      const viewAnswers1 = arrayAnswers1.map((element) => {
+        return {
+          questionId: element.idQuestion,
+          answerStatus: element.answerStatus,
+          addedAt: element.createdAt,
+        };
+      });
+
+      const viewAnswers2 = arrayAnswers2.map((element) => {
+        return {
+          questionId: element.idQuestion,
+          answerStatus: element.answerStatus,
+          addedAt: element.createdAt,
+        };
+      });
+
+      //@ts-ignore
+      const arrayQuestion = el.randomQuestion.map((element: RandomQuestion) => {
+        return {
+          id: element.question.id,
+          body: element.question.body,
+        };
+      });
       return {
         id: el.idGame,
         firstPlayerProgress: {
-          answers: [],
+          answers: viewAnswers1,
           player: {
             id: el.idPlayer1,
             login: el.loginPlayer1,
@@ -102,14 +139,14 @@ pagesCount это число
           score: el.scorePlayer1,
         },
         secondPlayerProgress: {
-          answers: [],
+          answers: viewAnswers2,
           player: {
             id: el.idPlayer2,
             login: el.loginPlayer2,
           },
           score: el.scorePlayer2,
         },
-        questions: 1,
+        questions: arrayQuestion,
         status: el.status,
         pairCreatedDate: el.pairCreatedDate,
         startGameDate: el.startGameDate,
