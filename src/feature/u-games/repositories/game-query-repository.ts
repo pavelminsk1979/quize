@@ -71,8 +71,6 @@ pageSize - размер  одной страницы, ПО УМОЛЧАНИЮ 10
       .orderBy(`g.${sortBy}`, sortDir)
       .addOrderBy('g.pairCreatedDate', 'DESC')
       .addOrderBy('a.idAnswer', 'ASC')
-      .skip(amountSkip)
-      .take(pageSize)
       .getManyAndCount();
 
     const resRandQuest = await this.gameRepository
@@ -81,8 +79,6 @@ pageSize - размер  одной страницы, ПО УМОЛЧАНИЮ 10
       .orderBy(`g.${sortBy}`, sortDir)
       .addOrderBy('g.pairCreatedDate', 'DESC')
       .addOrderBy('rq.idRandom', 'ASC')
-      .skip(amountSkip)
-      .take(pageSize)
       .getManyAndCount();
 
     const resArrayQuestions = await this.questionRepository.getAllQuestions();
