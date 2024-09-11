@@ -11,6 +11,15 @@ export class GameRepository {
     private readonly gameRepository: Repository<Game>,
   ) {}
 
+  async getAllGamesWithCurrentUser(userId: string) {
+    const result = await this.gameRepository
+      .createQueryBuilder('g')
+      .where('g.idPlayer1 = :userId', { userId })
+      .orWhere('g.idPlayer2 = :userId', { userId })
+      .getManyAndCount();
+    return result;
+  }
+
   async setStatusFinished(idGame: string) {
     await this.gameRepository
       .createQueryBuilder()

@@ -36,6 +36,85 @@ export class GameService {
     protected answerRepository: AnswerRepository,
   ) {}
 
+  async getStatisticMyGames(userId: string) {
+    const allGamesWithCurrentUser =
+      await this.gameRepository.getAllGamesWithCurrentUser(userId);
+
+    let sumScore = 0;
+
+    for (let i = 0; i < allGamesWithCurrentUser[0].length; i++) {
+      const item = allGamesWithCurrentUser[0][i];
+      if (item.idPlayer1 === userId) {
+        sumScore = sumScore + item.scorePlayer1;
+      }
+      if (item.idPlayer2 === userId) {
+        sumScore = sumScore + item.scorePlayer2;
+      }
+    }
+
+    /*средний бал за одну игру и округлить до 2-х 
+        чисел после запятой */
+    const avg = sumScore / allGamesWithCurrentUser[1];
+    const avgScores = Number(avg.toFixed(2));
+
+    /*определю количество побед и поражений и ничьи*/
+
+    let winsCount = 0;
+    let lossesCount = 0;
+    let drawsCount = 0;
+
+    for (let i = 0; i < allGamesWithCurrentUser[0].length; i++) {
+      const item = allGamesWithCurrentUser[0][i];
+
+      if (item.scorePlayer1 === item.scorePlayer2) {
+        drawsCount = drawsCount + 1;
+      }
+      if (item.scorePlayer1 > item.scorePlayer2) {
+        if (item.idPlayer1 === userId) {
+          winsCount = winsCount + 1;
+        }
+      }
+
+      if (item.scorePlayer1 > item.scorePlayer2) {
+        if (item.idPlayer2 === userId) {
+          lossesCount = lossesCount + 1;
+        }
+      }
+
+      if (item.scorePlayer1 < item.scorePlayer2) {
+        if (item.idPlayer1 === userId) {
+          lossesCount = lossesCount + 1;
+        }
+      }
+
+      if (item.scorePlayer1 < item.scorePlayer2) {
+        if (item.idPlayer2 === userId) {
+          winsCount = winsCount + 1;
+        }
+      }
+    }
+
+    if (allGamesWithCurrentUser[1] === 0) {
+      return {
+        sumScore: 0,
+        avgScores: 0,
+        gamesCount: 0,
+        winsCount: 0,
+        lossesCount: 0,
+        drawsCount: 0,
+      };
+    }
+
+    return {
+      sumScore,
+      avgScores,
+      gamesCount: allGamesWithCurrentUser[1],
+      winsCount,
+      lossesCount,
+      drawsCount,
+    };
+  }
+
   async getUnfinishedGame(userId: string) {
     /*ищу запись по айдишке со статусом 
     ЭКТИВ тоесть игра началась и пара имеется */

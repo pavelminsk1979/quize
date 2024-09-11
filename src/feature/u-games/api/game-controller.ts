@@ -20,7 +20,7 @@ import { ValidUUIDGuard } from '../../../common/guard/exist-game-guard';
 import { QueryParamsGameInputModel } from '../../../common/pipes/query-params-game-input-model';
 import { GameQueryRepository } from '../repositories/game-query-repository';
 
-@Controller('pair-game-quiz/pairs')
+@Controller('pair-game-quiz')
 export class GameController {
   constructor(
     protected gameService: GameService,
@@ -29,7 +29,7 @@ export class GameController {
 
   @UseGuards(AuthTokenGuard)
   @HttpCode(HttpStatus.OK)
-  @Post('connection')
+  @Post('pairs/connection')
   async startGame(@Req() request: Request) {
     // когда AccessToken проверяю в AuthTokenGuard - тогда
     // из него достаю userId и помещаю ее в request
@@ -50,7 +50,7 @@ export class GameController {
 
   @UseGuards(AuthTokenGuard)
   @HttpCode(HttpStatus.OK)
-  @Post('my-current/answers')
+  @Post('pairs/my-current/answers')
   async setAnswer(
     @Body() answerInputModel: AnswerInputModel,
     @Req() request: Request,
@@ -78,7 +78,7 @@ export class GameController {
 
   @UseGuards(AuthTokenGuard)
   @HttpCode(HttpStatus.OK)
-  @Get('my-current')
+  @Get('pairs/my-current')
   async getGameUnfinished(@Req() request: Request) {
     // когда AccessToken проверяю в AuthTokenGuard - тогда
     // из него достаю userId и помещаю ее в request
@@ -95,7 +95,7 @@ export class GameController {
  данного юзера   с  ПАГИНАЦИЕЙ И СОРТИРОВКОЙ*/
   @UseGuards(AuthTokenGuard)
   @HttpCode(HttpStatus.OK)
-  @Get('my')
+  @Get('pairs/my')
   async getAllGames(
     @Query() queryParamsGameInputModel: QueryParamsGameInputModel,
     @Req() request: Request,
@@ -115,7 +115,7 @@ export class GameController {
 
   @UseGuards(AuthTokenGuard, ValidUUIDGuard)
   @HttpCode(HttpStatus.OK)
-  @Get(':id')
+  @Get('pairs/:id')
   async getGameById(
     /*ParseIntPipe - это middleware в Nest.js
     Если значение параметра id не может быть преобразовано в число, будет выброшена ошибка 400 Bad Request*/
@@ -128,6 +128,20 @@ export class GameController {
     const userId = request['userId'];
 
     const game = await this.gameService.getGameById(userId, gameId.toString());
+
+    return game;
+  }
+
+  @UseGuards(AuthTokenGuard)
+  @HttpCode(HttpStatus.OK)
+  @Get('users/my-statistic')
+  async getStatisticMyGames(@Req() request: Request) {
+    // когда AccessToken проверяю в AuthTokenGuard - тогда
+    // из него достаю userId и помещаю ее в request
+
+    const userId = request['userId'];
+
+    const game = await this.gameService.getStatisticMyGames(userId);
 
     return game;
   }
