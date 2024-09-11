@@ -898,6 +898,6 @@ describe('tests for andpoint users', () => {
       .set('Authorization', `Bearer ${accessToken1}`)
       .expect(200);
     //console.log(res.body.items);
-    console.log(res.body);
+    console.log(res.body.items);
   });
 });

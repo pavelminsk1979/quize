@@ -11,6 +11,14 @@ export class QuestionRepository {
     private readonly questionRepository: Repository<Question>,
   ) {}
 
+  async getAllQuestions() {
+    const result = await this.questionRepository
+      .createQueryBuilder('q')
+      .getMany();
+
+    return result;
+  }
+
   async getQuestionById(questionId: string) {
     const result = await this.questionRepository
       .createQueryBuilder('q')

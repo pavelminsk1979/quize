@@ -49,10 +49,10 @@ export class Game {
   public connectionTabl: ConnectionTabl;
 
   @OneToMany(() => RandomQuestion, 'game')
-  public randomQuestion: RandomQuestion;
+  public randomQuestion: RandomQuestion[];
 
   @OneToMany(() => Answers, 'game')
-  public answers: Answers;
+  public answers: Answers[];
 }
 
 //одна игра - два(много\несколько- всего два) подключения

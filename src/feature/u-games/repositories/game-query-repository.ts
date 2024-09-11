@@ -4,13 +4,14 @@ import { Repository } from 'typeorm';
 import { Game } from '../domains/game.entity';
 import { QueryParamsGameInputModel } from '../../../common/pipes/query-params-game-input-model';
 import { SortDir } from '../../../common/types';
-import { RandomQuestion } from '../domains/random-question.entity';
+import { QuestionRepository } from '../../u-questions/repositories/question-repository';
 
 @Injectable()
 export class GameQueryRepository {
   constructor(
     @InjectRepository(Game)
     private readonly gameRepository: Repository<Game>,
+    protected questionRepository: QuestionRepository,
   ) {}
 
   async getAllGames(
@@ -59,16 +60,29 @@ pageSize - размер  одной страницы, ПО УМОЛЧАНИЮ 10
     const result = await this.gameRepository
       .createQueryBuilder('g')
       .leftJoinAndSelect('g.answers', 'a')
-      .leftJoinAndSelect('g.randomQuestion', 'rq')
-      .leftJoinAndSelect('rq.question', 'q')
       .orderBy(`g.${sortBy}`, sortDir)
       .addOrderBy('g.pairCreatedDate', 'DESC')
       .addOrderBy('a.idAnswer', 'ASC')
-      .addOrderBy('rq.idRandom', 'ASC')
-      .addOrderBy('q.id', 'ASC')
       .skip(amountSkip)
       .take(pageSize)
       .getManyAndCount();
+
+    const resRandQuest = await this.gameRepository
+      .createQueryBuilder('g')
+      .leftJoinAndSelect('g.randomQuestion', 'rq')
+      .orderBy(`g.${sortBy}`, sortDir)
+      .addOrderBy('g.pairCreatedDate', 'DESC')
+      .addOrderBy('rq.idRandom', 'ASC')
+      .skip(amountSkip)
+      .take(pageSize)
+      .getManyAndCount();
+
+    const resArrayQuestions = await this.questionRepository.getAllQuestions();
+
+    const arrayQuestions = resArrayQuestions.map((el) => {
+      return { id: el.id, body: el.body };
+      /*return { [el.id]: el.body };*/
+    });
 
     /*    result    возвращает кортеж, 
       где первый элемент - массив объектов, удовлетворяющих
@@ -96,68 +110,76 @@ pagesCount это число
       };
     }
 
-    //return result[0];
-    //return result[0][0].randomQuestion[0];
-    const viewItems = result[0].map((el) => {
-      //const a = el.randomQuestion
-      //@ts-ignore
-      const arrayAnswers1 = el.answers.filter(
-        (element) => element.idUser === el.idPlayer1,
+    const viewItems: any = [];
+
+    for (let i = 0; i < totalCount; i++) {
+      const item = result[0][i];
+
+      const answers1 = item.answers.filter(
+        (el) => el.idUser === item.idPlayer1,
       );
 
-      //@ts-ignore
-      const arrayAnswers2 = el.answers.filter(
-        (element) => element.idUser === el.idPlayer2,
+      const answers2 = item.answers.filter(
+        (el) => el.idUser === item.idPlayer2,
       );
 
-      const viewAnswers1 = arrayAnswers1.map((element) => {
+      const viewAnswers1 = answers1.map((el) => {
         return {
-          addedAt: element.createdAt,
-          answerStatus: element.answerStatus,
-          questionId: String(element.idQuestion),
+          addedAt: el.createdAt,
+          answerStatus: el.answerStatus,
+          questionId: el.idQuestion,
         };
       });
 
-      const viewAnswers2 = arrayAnswers2.map((element) => {
+      const viewAnswers2 = answers2.map((el) => {
         return {
-          addedAt: element.createdAt,
-          answerStatus: element.answerStatus,
-          questionId: String(element.idQuestion),
+          addedAt: el.createdAt,
+          answerStatus: el.answerStatus,
+          questionId: el.idQuestion,
         };
       });
 
-      //@ts-ignore
-      const arrayQuestion = el.randomQuestion.map((element: RandomQuestion) => {
+      const itemQuestion = resRandQuest[0][i];
+
+      const viewQustions = itemQuestion.randomQuestion.map((el) => {
+        const idQuestion = String(el.idQuestionFK);
+
+        const question = arrayQuestions.find(
+          (el) => String(el.id) === idQuestion,
+        );
         return {
-          id: String(element.question.id),
-          body: element.question.body,
+          id: idQuestion,
+          body: question?.body,
         };
       });
-      return {
-        id: String(el.idGame),
+
+      const obj = {
+        id: String(item.idGame),
         firstPlayerProgress: {
           answers: viewAnswers1,
           player: {
-            id: String(el.idPlayer1),
-            login: el.loginPlayer1,
+            id: item.idPlayer1,
+            login: item.loginPlayer1,
           },
-          score: el.scorePlayer1,
+          score: item.scorePlayer1,
         },
         secondPlayerProgress: {
           answers: viewAnswers2,
           player: {
-            id: String(el.idPlayer2),
-            login: el.loginPlayer2,
+            id: item.idPlayer2,
+            login: item.loginPlayer2,
           },
-          score: el.scorePlayer2,
+          score: item.scorePlayer2,
         },
-        questions: arrayQuestion,
-        status: el.status,
-        pairCreatedDate: el.pairCreatedDate,
-        startGameDate: el.startGameDate,
-        finishGameDate: el.finishGameDate,
+        questions: viewQustions,
+        status: item.status,
+        pairCreatedDate: item.pairCreatedDate,
+        startGameDate: item.startGameDate,
+        finishGameDate: item.finishGameDate,
       };
-    });
+
+      viewItems.push(obj);
+    }
 
     return {
       pagesCount,
