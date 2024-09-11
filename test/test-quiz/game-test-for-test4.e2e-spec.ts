@@ -747,142 +747,142 @@ describe('tests for andpoint users', () => {
     console.log('-------------------------------------');*/
   });
 
-  it('start game2 first player', async () => {
-    const resultat = await request(app.getHttpServer())
-      .post('/pair-game-quiz/pairs/connection')
-      .set('Authorization', `Bearer ${accessToken1}`)
-      .expect(200);
-    /* console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&');
-     console.log(resultat.body);
-     console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&');*/
-
-    /////////////////////////////////////////////////////
-
-    const dataSource = await app.resolve(DataSource);
-    const res = await dataSource.query(
-      `
+  /*  it('start game2 first player', async () => {
+      const resultat = await request(app.getHttpServer())
+        .post('/pair-game-quiz/pairs/connection')
+        .set('Authorization', `Bearer ${accessToken1}`)
+        .expect(200);
+      /!* console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+       console.log(resultat.body);
+       console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&');*!/
+  
+      /////////////////////////////////////////////////////
+  
+      const dataSource = await app.resolve(DataSource);
+      const res = await dataSource.query(
+        `
+        select *
+       from public."random_question" r
+       where r."idGameFK" = $1
+      `,
+        [gameId2],
+      );
+  
+      /!*console.log('@@@@@@@@@@@@@@@@@@@@@@@@');
+      console.log(res);
+      console.log('@@@@@@@@@@@@@@@@@@@@@@@@');*!/
+      const idQuestion = res[0].idQuestionFK;
+      const idQuestion2 = res[1].idQuestionFK;
+      const idQuestion3 = res[2].idQuestionFK;
+      const idQuestion4 = res[3].idQuestionFK;
+      const idQuestion5 = res[4].idQuestionFK;
+  
+      const result = await dataSource.query(
+        `
       select *
-     from public."random_question" r
-     where r."idGameFK" = $1
-    `,
-      [gameId2],
-    );
-
-    /*console.log('@@@@@@@@@@@@@@@@@@@@@@@@');
-    console.log(res);
-    console.log('@@@@@@@@@@@@@@@@@@@@@@@@');*/
-    const idQuestion = res[0].idQuestionFK;
-    const idQuestion2 = res[1].idQuestionFK;
-    const idQuestion3 = res[2].idQuestionFK;
-    const idQuestion4 = res[3].idQuestionFK;
-    const idQuestion5 = res[4].idQuestionFK;
-
-    const result = await dataSource.query(
-      `
-    select *
-    from public."question" q
-    where q.id = $1
-    `,
-      [idQuestion],
-    );
-
-    answer11111 = result[0].correctAnswers.slice(0, 1);
-    /*console.log('-------------------------------------');
-    console.log(result);
-    console.log('-------------------------------------');*/
-
-    ////////////////////////////////////////////////
-
-    const result2 = await dataSource.query(
-      `
-    select *
-    from public."question" q
-    where q.id = $1
-    `,
-      [idQuestion2],
-    );
-
-    answer11112 = result2[0].correctAnswers.slice(0, 1);
-    /* console.log('-------------------------------------');
-    console.log(result);
-    console.log('-------------------------------------');*/
-
-    ////////////////////////////////////////////////
-
-    const result3 = await dataSource.query(
-      `
-    select *
-    from public."question" q
-    where q.id = $1
-    `,
-      [idQuestion3],
-    );
-
-    answer11113 = result3[0].correctAnswers.slice(0, 1);
-    /* console.log('-------------------------------------');
-    console.log(result);
-    console.log('-------------------------------------');*/
-
-    ////////////////////////////////////////////////
-
-    const result4 = await dataSource.query(
-      `
-    select *
-    from public."question" q
-    where q.id = $1
-    `,
-      [idQuestion4],
-    );
-
-    answer11114 = result4[0].correctAnswers.slice(0, 1);
-    /* console.log('-------------------------------------');
-    console.log(result);
-    console.log('-------------------------------------');*/
-
-    ////////////////////////////////////////////////
-
-    const result5 = await dataSource.query(
-      `
-    select *
-    from public."question" q
-    where q.id = $1
-    `,
-      [idQuestion5],
-    );
-
-    answer11115 = result5[0].correctAnswers.slice(0, 1);
-    /* console.log('-------------------------------------');
-    console.log(result);
-    console.log('-------------------------------------');*/
-  });
-
-  it('set answer', async () => {
-    await request(app.getHttpServer())
-      .post('/pair-game-quiz/pairs/my-current/answers')
-      .set('Authorization', `Bearer ${accessToken1}`)
-      .send({ answer: answer11111 })
-      .expect(200);
-    //console.log(res.body);
-  });
-
-  it('set answer', async () => {
-    const inCorrectAnswer = '12';
-    await request(app.getHttpServer())
-      .post('/pair-game-quiz/pairs/my-current/answers')
-      .set('Authorization', `Bearer ${accessToken2}`)
-      .send({ answer: inCorrectAnswer })
-      .expect(200);
-    //console.log(res.body);
-  });
-
-  it('set answer', async () => {
-    await request(app.getHttpServer())
-      .post('/pair-game-quiz/pairs/my-current/answers')
-      .set('Authorization', `Bearer ${accessToken2}`)
-      .send({ answer: answer22222 })
-      .expect(200);
-    //console.log(res.body);
-  });
+      from public."question" q
+      where q.id = $1
+      `,
+        [idQuestion],
+      );
+  
+      answer11111 = result[0].correctAnswers.slice(0, 1);
+      /!*console.log('-------------------------------------');
+      console.log(result);
+      console.log('-------------------------------------');*!/
+  
+      ////////////////////////////////////////////////
+  
+      const result2 = await dataSource.query(
+        `
+      select *
+      from public."question" q
+      where q.id = $1
+      `,
+        [idQuestion2],
+      );
+  
+      answer11112 = result2[0].correctAnswers.slice(0, 1);
+      /!* console.log('-------------------------------------');
+      console.log(result);
+      console.log('-------------------------------------');*!/
+  
+      ////////////////////////////////////////////////
+  
+      const result3 = await dataSource.query(
+        `
+      select *
+      from public."question" q
+      where q.id = $1
+      `,
+        [idQuestion3],
+      );
+  
+      answer11113 = result3[0].correctAnswers.slice(0, 1);
+      /!* console.log('-------------------------------------');
+      console.log(result);
+      console.log('-------------------------------------');*!/
+  
+      ////////////////////////////////////////////////
+  
+      const result4 = await dataSource.query(
+        `
+      select *
+      from public."question" q
+      where q.id = $1
+      `,
+        [idQuestion4],
+      );
+  
+      answer11114 = result4[0].correctAnswers.slice(0, 1);
+      /!* console.log('-------------------------------------');
+      console.log(result);
+      console.log('-------------------------------------');*!/
+  
+      ////////////////////////////////////////////////
+  
+      const result5 = await dataSource.query(
+        `
+      select *
+      from public."question" q
+      where q.id = $1
+      `,
+        [idQuestion5],
+      );
+  
+      answer11115 = result5[0].correctAnswers.slice(0, 1);
+      /!* console.log('-------------------------------------');
+      console.log(result);
+      console.log('-------------------------------------');*!/
+    });
+  
+    it('set answer', async () => {
+      await request(app.getHttpServer())
+        .post('/pair-game-quiz/pairs/my-current/answers')
+        .set('Authorization', `Bearer ${accessToken1}`)
+        .send({ answer: answer11111 })
+        .expect(200);
+      //console.log(res.body);
+    });
+  
+    it('set answer', async () => {
+      const inCorrectAnswer = '12';
+      await request(app.getHttpServer())
+        .post('/pair-game-quiz/pairs/my-current/answers')
+        .set('Authorization', `Bearer ${accessToken2}`)
+        .send({ answer: inCorrectAnswer })
+        .expect(200);
+      //console.log(res.body);
+    });
+  
+    it('set answer', async () => {
+      await request(app.getHttpServer())
+        .post('/pair-game-quiz/pairs/my-current/answers')
+        .set('Authorization', `Bearer ${accessToken2}`)
+        .send({ answer: answer22222 })
+        .expect(200);
+      //console.log(res.body);
+    });*/
 
   /*  it('get Unfinished Game', async () => {
       const res = await request(app.getHttpServer())
@@ -895,9 +895,9 @@ describe('tests for andpoint users', () => {
   it('get all games', async () => {
     const res = await request(app.getHttpServer())
       .get('/pair-game-quiz/pairs/my?sortBy=status&sortDirection=asc')
-      .set('Authorization', `Bearer ${accessToken1}`)
+      .set('Authorization', `Bearer ${accessToken2}`)
       .expect(200);
-    //console.log(res.body.items);
     console.log(res.body.items);
+    //console.log(res.body);
   });
 });

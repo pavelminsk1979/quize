@@ -59,6 +59,14 @@ pageSize - размер  одной страницы, ПО УМОЛЧАНИЮ 10
 
     const result = await this.gameRepository
       .createQueryBuilder('g')
+      .orderBy(`g.${sortBy}`, sortDir)
+      .addOrderBy('g.pairCreatedDate', 'DESC')
+      .skip(amountSkip)
+      .take(pageSize)
+      .getManyAndCount();
+
+    const resAnswers = await this.gameRepository
+      .createQueryBuilder('g')
       .leftJoinAndSelect('g.answers', 'a')
       .orderBy(`g.${sortBy}`, sortDir)
       .addOrderBy('g.pairCreatedDate', 'DESC')
@@ -115,43 +123,57 @@ pagesCount это число
     for (let i = 0; i < totalCount; i++) {
       const item = result[0][i];
 
-      const answers1 = item.answers.filter(
-        (el) => el.idUser === item.idPlayer1,
-      );
+      const viewAnswers1: any = [];
 
-      const answers2 = item.answers.filter(
-        (el) => el.idUser === item.idPlayer2,
-      );
+      const viewAnswers2: any = [];
 
-      const viewAnswers1 = answers1.map((el) => {
-        return {
-          addedAt: el.createdAt,
-          answerStatus: el.answerStatus,
-          questionId: el.idQuestion,
-        };
-      });
-
-      const viewAnswers2 = answers2.map((el) => {
-        return {
-          addedAt: el.createdAt,
-          answerStatus: el.answerStatus,
-          questionId: el.idQuestion,
-        };
-      });
-
-      const itemQuestion = resRandQuest[0][i];
-
-      const viewQustions = itemQuestion.randomQuestion.map((el) => {
-        const idQuestion = String(el.idQuestionFK);
-
-        const question = arrayQuestions.find(
-          (el) => String(el.id) === idQuestion,
+      if (resAnswers[0][i] !== undefined) {
+        const answers1 = resAnswers[0][i].answers.filter(
+          (el) => el.idUser === item.idPlayer1,
         );
-        return {
-          id: idQuestion,
-          body: question?.body,
-        };
-      });
+
+        const answers2 = resAnswers[0][i].answers.filter(
+          (el) => el.idUser === item.idPlayer2,
+        );
+
+        const viewAnsw1 = answers1.map((el) => {
+          return {
+            addedAt: el.createdAt,
+            answerStatus: el.answerStatus,
+            questionId: el.idQuestion,
+          };
+        });
+
+        viewAnswers1.push(...viewAnsw1);
+
+        const viewAnsw2 = answers2.map((el) => {
+          return {
+            addedAt: el.createdAt,
+            answerStatus: el.answerStatus,
+            questionId: el.idQuestion,
+          };
+        });
+
+        viewAnswers2.push(...viewAnsw2);
+      }
+
+      const viewQustions: any = [];
+
+      if (resRandQuest[0][i] !== undefined) {
+        const viewQust = resRandQuest[0][i].randomQuestion.map((el) => {
+          const idQuestion = String(el.idQuestionFK);
+
+          const question = arrayQuestions.find(
+            (el) => String(el.id) === idQuestion,
+          );
+          return {
+            id: idQuestion,
+            body: question?.body,
+          };
+        });
+
+        viewQustions.push(...viewQust);
+      }
 
       const obj = {
         id: String(item.idGame),
