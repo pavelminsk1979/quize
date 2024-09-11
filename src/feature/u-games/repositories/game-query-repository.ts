@@ -62,6 +62,8 @@ pageSize - размер  одной страницы, ПО УМОЛЧАНИЮ 10
       .leftJoinAndSelect('g.randomQuestion', 'rq')
       .leftJoinAndSelect('rq.question', 'q')
       .orderBy(`g.${sortBy}`, sortDir)
+      .addOrderBy('g.pairCreatedDate', 'DESC')
+      .addOrderBy('a.idAnswer', 'ASC')
       .addOrderBy('rq.idRandom', 'ASC')
       .addOrderBy('q.id', 'ASC')
       .skip(amountSkip)
@@ -94,7 +96,7 @@ pagesCount это число
       };
     }
 
-    return result[0];
+    //return result[0];
     //return result[0][0].randomQuestion[0];
     const viewItems = result[0].map((el) => {
       //const a = el.randomQuestion
@@ -110,33 +112,33 @@ pagesCount это число
 
       const viewAnswers1 = arrayAnswers1.map((element) => {
         return {
-          questionId: element.idQuestion,
-          answerStatus: element.answerStatus,
           addedAt: element.createdAt,
+          answerStatus: element.answerStatus,
+          questionId: String(element.idQuestion),
         };
       });
 
       const viewAnswers2 = arrayAnswers2.map((element) => {
         return {
-          questionId: element.idQuestion,
-          answerStatus: element.answerStatus,
           addedAt: element.createdAt,
+          answerStatus: element.answerStatus,
+          questionId: String(element.idQuestion),
         };
       });
 
       //@ts-ignore
       const arrayQuestion = el.randomQuestion.map((element: RandomQuestion) => {
         return {
-          id: element.question.id,
+          id: String(element.question.id),
           body: element.question.body,
         };
       });
       return {
-        id: el.idGame,
+        id: String(el.idGame),
         firstPlayerProgress: {
           answers: viewAnswers1,
           player: {
-            id: el.idPlayer1,
+            id: String(el.idPlayer1),
             login: el.loginPlayer1,
           },
           score: el.scorePlayer1,
@@ -144,7 +146,7 @@ pagesCount это число
         secondPlayerProgress: {
           answers: viewAnswers2,
           player: {
-            id: el.idPlayer2,
+            id: String(el.idPlayer2),
             login: el.loginPlayer2,
           },
           score: el.scorePlayer2,
