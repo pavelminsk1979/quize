@@ -62,6 +62,8 @@ pageSize - размер  одной страницы, ПО УМОЛЧАНИЮ 10
       .leftJoinAndSelect('g.randomQuestion', 'rq')
       .leftJoinAndSelect('rq.question', 'q')
       .orderBy(`g.${sortBy}`, sortDir)
+      .addOrderBy('rq.idRandom', 'ASC')
+      .addOrderBy('q.id', 'ASC')
       .skip(amountSkip)
       .take(pageSize)
       .getManyAndCount();
@@ -92,9 +94,10 @@ pagesCount это число
       };
     }
 
-    //return result[0];
+    return result[0];
     //return result[0][0].randomQuestion[0];
     const viewItems = result[0].map((el) => {
+      //const a = el.randomQuestion
       //@ts-ignore
       const arrayAnswers1 = el.answers.filter(
         (element) => element.idUser === el.idPlayer1,

@@ -894,10 +894,10 @@ describe('tests for andpoint users', () => {
 
   it('get all games', async () => {
     const res = await request(app.getHttpServer())
-      .get('/pair-game-quiz/pairs/my')
+      .get('/pair-game-quiz/pairs/my?sortBy=status&sortDirection=asc')
       .set('Authorization', `Bearer ${accessToken1}`)
       .expect(200);
-    console.log(res.body.items[0].firstPlayerProgress);
-    //console.log(res.body[1]);
+    //console.log(res.body.items);
+    console.log(res.body);
   });
 });
