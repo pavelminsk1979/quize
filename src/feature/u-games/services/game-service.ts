@@ -37,9 +37,18 @@ export class GameService {
   ) {}
 
   async getStatisticMyGames(userId: string) {
-    const allGamesWithCurrentUser =
+    const allGamesWithCurrentUser: [Game[], number] =
       await this.gameRepository.getAllGamesWithCurrentUser(userId);
 
+    const res = this.getStatisticsForOneUser(userId, allGamesWithCurrentUser);
+
+    return res;
+  }
+
+  getStatisticsForOneUser(
+    userId: string,
+    allGamesWithCurrentUser: [Game[], number],
+  ) {
     let sumScore = 0;
 
     for (let i = 0; i < allGamesWithCurrentUser[0].length; i++) {
