@@ -24,6 +24,7 @@ import { RandomQuestionRepository } from '../repositories/random-question-reposi
 import { AnswerRepository } from '../repositories/answer-repository';
 import { Game } from '../domains/game.entity';
 import { Usertyp } from '../../users/domains/usertyp.entity';
+import { QueryParamStatisticInputModel } from '../../../common/pipes/query-param-statistic-input-model';
 
 @Injectable()
 export class GameService {
@@ -35,6 +36,35 @@ export class GameService {
     protected randomQuestionRepository: RandomQuestionRepository,
     protected answerRepository: AnswerRepository,
   ) {}
+
+  async getStatisticGamesWithPagination(
+    queryParamStatisticInputModel: QueryParamStatisticInputModel,
+  ) {
+    const { sort, pageSize, pageNumber } = queryParamStatisticInputModel;
+
+    const allGames = await this.gameRepository.getAllGames();
+
+    //массив айдишек получу и будут дублироватся айдишки
+
+    const allUserId = allGames[0].flatMap((el: Game) => [
+      el.idPlayer1,
+      el.idPlayer2,
+    ]);
+
+    //массив уникальных айдишек получу
+
+    const arrayUserId = [...new Set(allUserId)];
+
+    for (let i = 0; i < arrayUserId.length; i++) {}
+
+    const arrayStatistic = arrayUserId.map((el) => {
+      /*  const allGamesWithCurrentUser: [Game[], number] =
+        await this.gameRepository.getAllGamesWithCurrentUser(el);*/
+      //return this.getStatisticGamesWithPagination();
+    });
+
+    return arrayUserId;
+  }
 
   async getStatisticMyGames(userId: string) {
     const allGamesWithCurrentUser: [Game[], number] =

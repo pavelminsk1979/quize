@@ -19,6 +19,7 @@ import { AnswerInputModel } from './pipes/answer-input-model';
 import { ValidUUIDGuard } from '../../../common/guard/exist-game-guard';
 import { QueryParamsGameInputModel } from '../../../common/pipes/query-params-game-input-model';
 import { GameQueryRepository } from '../repositories/game-query-repository';
+import { QueryParamStatisticInputModel } from '../../../common/pipes/query-param-statistic-input-model';
 
 @Controller('pair-game-quiz')
 export class GameController {
@@ -141,8 +142,21 @@ export class GameController {
 
     const userId = request['userId'];
 
-    const game = await this.gameService.getStatisticMyGames(userId);
+    const statisticOneGame = await this.gameService.getStatisticMyGames(userId);
 
-    return game;
+    return statisticOneGame;
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('users/top')
+  async getStatisticGamesWithPagination(
+    @Query() queryParamStatisticInputModel: QueryParamStatisticInputModel,
+  ) {
+    const statisticGamesWithPagination =
+      await this.gameService.getStatisticGamesWithPagination(
+        queryParamStatisticInputModel,
+      );
+
+    return statisticGamesWithPagination;
   }
 }

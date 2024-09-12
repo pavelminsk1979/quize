@@ -11,6 +11,13 @@ export class GameRepository {
     private readonly gameRepository: Repository<Game>,
   ) {}
 
+  async getAllGames() {
+    const result = await this.gameRepository
+      .createQueryBuilder('g')
+      .getManyAndCount();
+    return result;
+  }
+
   async getAllGamesWithCurrentUser(userId: string) {
     const result = await this.gameRepository
       .createQueryBuilder('g')
