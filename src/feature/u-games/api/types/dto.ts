@@ -95,3 +95,12 @@ export type Answer = {
   answerStatus: AnswerStatus;
   addedAt: string;
 };
+
+export type Statistic = {
+  sumScore: number;
+  avgScores: number;
+  gamesCount: number;
+  winsCount: number;
+  lossesCount: number;
+  drawsCount: number;
+};

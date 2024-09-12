@@ -16,6 +16,7 @@ import {
   CreateGame,
   GameStatus,
   Random,
+  Statistic,
 } from '../api/types/dto';
 import { QuestionRepository } from '../../u-questions/repositories/question-repository';
 import { UserSqlTypeormRepository } from '../../users/repositories/user-sql-typeorm-repository';
@@ -42,28 +43,65 @@ export class GameService {
   ) {
     const { sort, pageSize, pageNumber } = queryParamStatisticInputModel;
 
-    const allGames = await this.gameRepository.getAllGames();
+    const allGames: [Game[], number] = await this.gameRepository.getAllGames();
+
+    if (allGames === null) {
+      return {
+        sumScore: 0,
+        avgScores: 0,
+        gamesCount: 0,
+        winsCount: 0,
+        lossesCount: 0,
+        drawsCount: 0,
+      };
+    }
 
     //массив айдишек получу и будут дублироватся айдишки
 
-    const allUserId = allGames[0].flatMap((el: Game) => [
+    const allUserId: string[] = allGames[0].flatMap((el: Game) => [
       el.idPlayer1,
       el.idPlayer2,
-    ]);
+    ]) as string[];
 
     //массив уникальных айдишек получу
 
-    const arrayUserId = [...new Set(allUserId)];
+    const arrayUserId: string[] = [...new Set(allUserId)];
 
-    for (let i = 0; i < arrayUserId.length; i++) {}
+    const arrayStatisticForAllUsers: Statistic[] = [];
 
-    const arrayStatistic = arrayUserId.map((el) => {
-      /*  const allGamesWithCurrentUser: [Game[], number] =
-        await this.gameRepository.getAllGamesWithCurrentUser(el);*/
-      //return this.getStatisticGamesWithPagination();
-    });
+    for (let i = 0; i < arrayUserId.length; i++) {
+      const allGamesWithCurrentUser: [Game[], number] =
+        await this.gameRepository.getAllGamesWithCurrentUser(arrayUserId[i]);
 
-    return arrayUserId;
+      const statisticForOneUser = this.getStatisticsForOneUser(
+        arrayUserId[i],
+        allGamesWithCurrentUser,
+      );
+
+      arrayStatisticForAllUsers.push(statisticForOneUser);
+    }
+
+    //////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////
+
+    /*   НАДО УКАЗЫВАТЬ КОЛИЧЕСТВО ПРОПУЩЕНЫХ
+ЗАПИСЕЙ - чтобы получать следующие за ними
+
+
+pageNumber по умолчанию 1, тобишь
+мне надо первую страницу на фронтенд отдать
+, и это будут первые 10 записей из таблицы
+
+pageSize - размер  одной страницы, ПО УМОЛЧАНИЮ 10
+ТОБИШЬ НАДО ПРОПУСКАТЬ НОЛЬ ЗАПИСЕЙ
+(pageNumber - 1) * pageSize
+
+*/
+
+    const amountSkip = (pageNumber - 1) * pageSize;
+
+    return arrayStatisticForAllUsers;
   }
 
   async getStatisticMyGames(userId: string) {
