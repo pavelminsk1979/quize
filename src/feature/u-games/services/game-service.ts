@@ -770,6 +770,63 @@ pageSize - размер  одной страницы, ПО УМОЛЧАНИЮ 10
       }
     }
 
+    ///////////////////////////////////////////////////////////
+    /* и также если игрок дал любой ответ
+    буду работать с таблицей Statistic*/
+
+    /*есть ли в таблице Statistic запись такого юзера
+    по userId*/
+
+    const rowStatistic =
+      await this.statisticRepository.getRowStatisticByIdUser(userId);
+
+    //если записи нет - ее надо создать
+    if (!rowStatistic) {
+      //от юзера нужен ЛОГИН
+
+      const rowUser = await this.userSqlTypeormRepository.getUserById(userId);
+
+      if (!rowUser) {
+        throw new NotFoundException();
+      } else {
+        const userLogin = rowUser.login;
+
+        const newRowStatistic: NewRowStatistic = {
+          idUser: userId,
+          userLogin,
+        };
+
+        await this.statisticRepository.createNewRowStatistic(newRowStatistic);
+      }
+    }
+
+    /*в таблице Statistic   запись либо была ранее либо
+    толькочто  создана и теперь надо добавить ДЛЯ 
+    ЭТОЙ ЗАПИСИ СТАТИСТИКУ*/
+
+    const allGamesWithCurrentUser: [Game[], number] =
+      await this.gameRepository.getAllGamesWithCurrentUser(userId);
+
+    const resStatistic: StatisticType = this.getStatisticsForOneUser(
+      userId,
+      allGamesWithCurrentUser,
+    );
+
+    /*  в res будут данные вида
+       {
+          sumScore: 15,
+          avgScores: 5,
+          gamesCount: 3,
+          winsCount: 1,
+          lossesCount: 1,
+          drawsCount: 1
+        } 
+        ИХ ПОМЕЩАЮ В ТАБЛИЦУ Statistic*/
+
+    await this.statisticRepository.updateStatistic(resStatistic, userId);
+
+    ///////////////////////////////////////////////////////////
+
     //на фронт возвращаю viewModel
 
     return {
