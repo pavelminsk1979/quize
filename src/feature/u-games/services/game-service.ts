@@ -561,9 +561,6 @@ export class GameService {
       await this.connectionRepository.updateRowRightAnswer(
         String(connectionUserId1),
       );
-      //также статистику пересчитаю
-
-      await this.workStatistic(userId);
     }
     /*надо запросить количество записей в таблице
     Answers для данного юзера по idUser и если
@@ -623,10 +620,6 @@ export class GameService {
         /*  установить статус окончания игры */
 
         await this.gameRepository.setStatusFinished(idGame);
-
-        //также статистику пересчитаю
-
-        await this.workStatistic(userId);
       }
 
       /*ТУТ ПРО ДОПОЛНИТЕЛЬНЫЙ БАЛЛ ДЛЯ ПЕРВОГО ОТВЕТИВШЕГО
@@ -645,9 +638,7 @@ export class GameService {
             String(connectionUserId1),
           );
         if (!getRowByIdConnection) {
-          throw new NotFoundException(
-            'getRowByIdConnection not found...file:game-service...  method:setAnswer',
-          );
+          throw new NotFoundException();
         }
         if (getRowByIdConnection.rightanswer === 'ok') {
           await this.connectionRepository.updateRowBonus(
@@ -657,20 +648,8 @@ export class GameService {
           /*также добавлю бал в таблицу Game*/
 
           await this.setScoreInTableGame(userId, idGame);
-
-          //также статистику пересчитаю
-
-          await this.workStatistic(userId);
         }
-
-        //также статистику пересчитаю
-
-        await this.workStatistic(userId);
       }
-
-      //также статистику пересчитаю
-
-      await this.workStatistic(userId);
     }
 
     ///////////////////////////////////////////////////////////
