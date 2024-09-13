@@ -28,7 +28,6 @@ import { Game } from '../domains/game.entity';
 import { Usertyp } from '../../users/domains/usertyp.entity';
 import { QueryParamStatisticInputModel } from '../../../common/pipes/query-param-statistic-input-model';
 import { StatisticRepository } from '../repositories/statistic-repository';
-import { Statistic } from '../domains/statistic.entity';
 
 @Injectable()
 export class GameService {
