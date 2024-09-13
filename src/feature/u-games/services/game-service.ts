@@ -28,6 +28,7 @@ import { Game } from '../domains/game.entity';
 import { Usertyp } from '../../users/domains/usertyp.entity';
 import { QueryParamStatisticInputModel } from '../../../common/pipes/query-param-statistic-input-model';
 import { StatisticRepository } from '../repositories/statistic-repository';
+import { Statistic } from '../domains/statistic.entity';
 
 @Injectable()
 export class GameService {
@@ -772,60 +773,13 @@ pageSize - размер  одной страницы, ПО УМОЛЧАНИЮ 10
 
     ///////////////////////////////////////////////////////////
     /* и также если игрок дал любой ответ
-    буду работать с таблицей Statistic*/
+    буду работать с таблицей Statistic
+    ---------также статистику  пересчитываю когда Connection
+    тобишь когда игрок подключается ЛИБО ПЕРВЫМ
+    ЛИБО ВТОРЫМ -- тогда новая игра создается
+    и это поменяет статистику */
 
-    /*есть ли в таблице Statistic запись такого юзера
-    по userId*/
-
-    const rowStatistic =
-      await this.statisticRepository.getRowStatisticByIdUser(userId);
-
-    //если записи нет - ее надо создать
-    if (!rowStatistic) {
-      //от юзера нужен ЛОГИН
-
-      const rowUser = await this.userSqlTypeormRepository.getUserById(userId);
-
-      if (!rowUser) {
-        throw new NotFoundException();
-      } else {
-        const userLogin = rowUser.login;
-
-        const newRowStatistic: NewRowStatistic = {
-          idUser: userId,
-          userLogin,
-        };
-
-        await this.statisticRepository.createNewRowStatistic(newRowStatistic);
-      }
-    }
-
-    /*в таблице Statistic   запись либо была ранее либо
-    толькочто  создана и теперь надо добавить ДЛЯ 
-    ЭТОЙ ЗАПИСИ СТАТИСТИКУ*/
-
-    const allGamesWithCurrentUser: [Game[], number] =
-      await this.gameRepository.getAllGamesWithCurrentUser(userId);
-
-    const resStatistic: StatisticType = this.getStatisticsForOneUser(
-      userId,
-      allGamesWithCurrentUser,
-    );
-
-    /*  в res будут данные вида
-       {
-          sumScore: 15,
-          avgScores: 5,
-          gamesCount: 3,
-          winsCount: 1,
-          lossesCount: 1,
-          drawsCount: 1
-        } 
-        ИХ ПОМЕЩАЮ В ТАБЛИЦУ Statistic*/
-
-    await this.statisticRepository.updateStatistic(resStatistic, userId);
-
-    ///////////////////////////////////////////////////////////
+    await this.workStatistic(userId);
 
     //на фронт возвращаю viewModel
 
@@ -964,6 +918,14 @@ pageSize - размер  одной страницы, ПО УМОЛЧАНИЮ 10
      ибо не нужно на этом этапе */
       await Promise.all(promisesPanding);
 
+      /* пересчет статистики для таблицы Statistic
+      --- пересчет происходит каждый раз когда 
+       --или ответ игрок дал
+      --или подключился к игре первый игрок
+       -- или подключился к игре второй игрок */
+
+      await this.workStatistic(userId);
+
       /* далее надо собрать ответ и отдать на фронт
       структура ответа прописана в свагере
       типизация  - RequestFirstPlayer*/
@@ -1068,6 +1030,14 @@ pageSize - размер  одной страницы, ПО УМОЛЧАНИЮ 10
       };
     });
 
+    /* пересчет статистики для таблицы Statistic
+ --- пересчет происходит каждый раз когда 
+  --или ответ игрок дал
+ --или подключился к игре первый игрок
+  -- или подключился к игре второй игрок */
+
+    await this.workStatistic(userId);
+
     /* далее надо собрать ответ и отдать на фронт
     структура ответа прописана в свагере
     типизация  - RequestFirstPlayer*/
@@ -1135,5 +1105,59 @@ pageSize - размер  одной страницы, ПО УМОЛЧАНИЮ 10
     } else {
       await this.gameRepository.incrementScoreForPlayer2(idGame);
     }
+  }
+
+  async workStatistic(userId: string) {
+    /*есть ли в таблице Statistic запись такого юзера
+   по userId*/
+
+    const rowStatistic =
+      await this.statisticRepository.getRowStatisticByIdUser(userId);
+
+    //если записи нет - ее надо создать
+    if (!rowStatistic) {
+      //от юзера нужен ЛОГИН
+
+      const rowUser = await this.userSqlTypeormRepository.getUserById(userId);
+
+      if (!rowUser) {
+        throw new NotFoundException();
+      }
+      const userLogin = rowUser.login;
+
+      const newRowStatistic: NewRowStatistic = {
+        idUser: userId,
+        userLogin,
+      };
+
+      await this.statisticRepository.createNewRowStatistic(newRowStatistic);
+    }
+
+    /*в таблице Statistic   запись либо была ранее либо
+    толькочто  создана и теперь надо добавить ДЛЯ 
+    ЭТОЙ ЗАПИСИ СТАТИСТИКУ*/
+
+    const allGamesWithCurrentUser: [Game[], number] =
+      await this.gameRepository.getAllGamesWithCurrentUser(userId);
+
+    const resStatistic: StatisticType = this.getStatisticsForOneUser(
+      userId,
+      allGamesWithCurrentUser,
+    );
+    debugger;
+    /*  в resStatistic будут данные вида
+       {
+          sumScore: 15,
+          avgScores: 5,
+          gamesCount: 3,
+          winsCount: 1,
+          lossesCount: 1,
+          drawsCount: 1
+        } 
+        ИХ ПОМЕЩАЮ В ТАБЛИЦУ Statistic*/
+
+    await this.statisticRepository.updateStatistic(resStatistic, userId);
+
+    ///////////////////////////////////////////////////////////
   }
 }

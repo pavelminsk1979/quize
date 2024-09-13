@@ -1,6 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { AnswerStatus } from '../api/types/dto';
-import { Game } from './game.entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 /*не создает таблицы без
@@ -19,7 +17,7 @@ export class Statistic {
   @Column({ type: 'integer', default: 0 })
   public sumScore: number;
 
-  @Column({ type: 'numeric', precision: 5, scale: 2 })
+  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0 })
   public avgScores: number;
 
   @Column({ type: 'integer', default: 0 })

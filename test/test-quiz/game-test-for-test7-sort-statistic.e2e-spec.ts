@@ -1582,4 +1582,31 @@ describe('tests for andpoint users', () => {
   
       console.log(res.body);
     });*/
+
+  it('get statistic my  games', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/pair-game-quiz/users/my-statistic')
+      .set('Authorization', `Bearer ${accessToken1}`)
+      .expect(200);
+
+    console.log(res.body);
+  });
+
+  it('get statistic my  games', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/pair-game-quiz/users/my-statistic')
+      .set('Authorization', `Bearer ${accessToken2}`)
+      .expect(200);
+
+    console.log(res.body);
+  });
+
+  it('get statistic my  games', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/pair-game-quiz/users/my-statistic')
+      .set('Authorization', `Bearer ${accessToken3}`)
+      .expect(200);
+
+    console.log(res.body);
+  });
 });
