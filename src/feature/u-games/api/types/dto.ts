@@ -96,11 +96,16 @@ export type Answer = {
   addedAt: string;
 };
 
-export type Statistic = {
+export type StatisticType = {
   sumScore: number;
   avgScores: number;
   gamesCount: number;
   winsCount: number;
   lossesCount: number;
   drawsCount: number;
+};
+
+export type NewRowStatistic = {
+  idUser: string;
+  userLogin: string;
 };

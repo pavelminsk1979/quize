@@ -15,8 +15,9 @@ import {
   CreateAnswer,
   CreateGame,
   GameStatus,
+  NewRowStatistic,
   Random,
-  Statistic,
+  StatisticType,
 } from '../api/types/dto';
 import { QuestionRepository } from '../../u-questions/repositories/question-repository';
 import { UserSqlTypeormRepository } from '../../users/repositories/user-sql-typeorm-repository';
@@ -26,6 +27,7 @@ import { AnswerRepository } from '../repositories/answer-repository';
 import { Game } from '../domains/game.entity';
 import { Usertyp } from '../../users/domains/usertyp.entity';
 import { QueryParamStatisticInputModel } from '../../../common/pipes/query-param-statistic-input-model';
+import { StatisticRepository } from '../repositories/statistic-repository';
 
 @Injectable()
 export class GameService {
@@ -36,6 +38,7 @@ export class GameService {
     protected userSqlTypeormRepository: UserSqlTypeormRepository,
     protected randomQuestionRepository: RandomQuestionRepository,
     protected answerRepository: AnswerRepository,
+    protected statisticRepository: StatisticRepository,
   ) {}
 
   async getStatisticGamesWithPagination(
@@ -67,7 +70,7 @@ export class GameService {
 
     const arrayUserId: string[] = [...new Set(allUserId)];
 
-    const arrayStatisticForAllUsers: Statistic[] = [];
+    const arrayStatisticForAllUsers: StatisticType[] = [];
 
     for (let i = 0; i < arrayUserId.length; i++) {
       const allGamesWithCurrentUser: [Game[], number] =
@@ -98,7 +101,7 @@ pageSize - размер  одной страницы, ПО УМОЛЧАНИЮ 10
 (pageNumber - 1) * pageSize
 
 */
-
+    return arrayStatisticForAllUsers;
     const amountSkip = (pageNumber - 1) * pageSize;
 
     ///////////////////////////////////////////////////////

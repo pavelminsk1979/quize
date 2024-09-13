@@ -14,6 +14,7 @@ import { ConnectionTabl } from '../u-games/domains/connection.entity';
 import { RandomQuestion } from '../u-games/domains/random-question.entity';
 import { Game } from '../u-games/domains/game.entity';
 import { Answers } from '../u-games/domains/answers.entity';
+import { Statistic } from '../u-games/domains/statistic.entity';
 
 @Controller('testing')
 export class TestController {
@@ -42,6 +43,8 @@ export class TestController {
     private readonly gameRepository: Repository<Game>,
     @InjectRepository(Answers)
     private readonly answersRepository: Repository<Answers>,
+    @InjectRepository(Statistic)
+    private readonly statisticRepository: Repository<Statistic>,
   ) {}
 
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -56,6 +59,7 @@ export class TestController {
     await this.commenttypRepository.delete({});
     await this.likeForPostTypRepository.delete({});
     await this.securitydeviceRepository.delete({});
+    await this.statisticRepository.delete({});
     await this.usertypRepository.delete({});
     await this.posttypRepository.delete({});
     await this.blogtypRepository.delete({});
