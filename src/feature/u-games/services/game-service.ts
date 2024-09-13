@@ -101,7 +101,54 @@ pageSize - размер  одной страницы, ПО УМОЛЧАНИЮ 10
 
     const amountSkip = (pageNumber - 1) * pageSize;
 
+    ///////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////
+    /////////////////////////////////////////////////
+
+    /*
+    arrayStatisticForAllUsers--- этот массив буду сортировать 
+        [
+          'avgScores desc',
+          'sumScore desc',
+          'winsCount desc',
+          'lossesCount asc'
+        ]
+    
+          [
+          'avgScores desc',
+            'sumScore desc',
+          ]
+        */
+
+    const arraySort = ['avgScores desc', 'sumScore desc'];
+
+    if (sort.length > 0) {
+      arraySort.splice(0, 2, ...sort);
+    }
+
+    /*  функция примет массив(который надо сортировать)
+      и строку(правила по которым буду сортировать 'avgScores desc')
+        -- и эта функция вернет в переменную масив отсортированый по этим правилам */
+    const functionSortArray = (array, string) => {
+      const arrayRules = string.split(' ');
+
+      if (arrayRules[1] === 'desc') {
+        return array.sort((a, b) => b[arrayRules[0]] - a[arrayRules[0]]);
+      } else {
+        return array.sort((a, b) => a[arrayRules[0]] - b[arrayRules[0]]);
+      }
+
+      return arrayRules;
+    };
+
+    const resultSortArray = functionSortArray(
+      arrayStatisticForAllUsers,
+      arraySort[0],
+    );
+
+    return resultSortArray;
     return arrayStatisticForAllUsers;
+    return { pageSize, pageNumber };
   }
 
   async getStatisticMyGames(userId: string) {
