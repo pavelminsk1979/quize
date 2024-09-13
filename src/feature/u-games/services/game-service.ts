@@ -26,7 +26,6 @@ import { RandomQuestionRepository } from '../repositories/random-question-reposi
 import { AnswerRepository } from '../repositories/answer-repository';
 import { Game } from '../domains/game.entity';
 import { Usertyp } from '../../users/domains/usertyp.entity';
-import { QueryParamStatisticInputModel } from '../../../common/pipes/query-param-statistic-input-model';
 import { StatisticRepository } from '../repositories/statistic-repository';
 
 @Injectable()
@@ -505,7 +504,7 @@ export class GameService {
      ЮЗЕРА*/
 
     const findResult = necessaryQuestion.question.correctAnswers.find(
-      (el) => el === answer,
+      (el) => el.trim() === answer.trim(),
     );
 
     /*  console.log('!!!!!!!!!!!!!!!!!!!!!');
@@ -531,7 +530,7 @@ export class GameService {
 
     const newAnswer: CreateAnswer = {
       createdAt: addedAt,
-      answer,
+      answer: answer.trim(),
       idUser: userId,
       idGame,
       answerStatus,
@@ -545,11 +544,9 @@ export class GameService {
     /*  если игрок дал верный ответ 
       ---добавлю 1 бал в таблицу Game*/
 
-    if (answerStatus === AnswerStatus.CORRECT) {
-      await this.setScoreInTableGame(userId, idGame);
-    }
-
     if (findResult) {
+      await this.setScoreInTableGame(userId, idGame);
+
       /*ТУТ ПРО ДОПОЛНИТЕЛЬНЫЙ БАЛЛ ДЛЯ ПЕРВОГО ОТВЕТИВШЕГО
     НА 5 ВОПРОСОВ  ЭТО ЧАСТЬ 1,   часть2 ниже далеко
      ---на каждый правильный ответ в таблице ConnectionTabl
@@ -564,6 +561,9 @@ export class GameService {
       await this.connectionRepository.updateRowRightAnswer(
         String(connectionUserId1),
       );
+      //также статистику пересчитаю
+
+      await this.workStatistic(userId);
     }
     /*надо запросить количество записей в таблице
     Answers для данного юзера по idUser и если
@@ -623,6 +623,10 @@ export class GameService {
         /*  установить статус окончания игры */
 
         await this.gameRepository.setStatusFinished(idGame);
+
+        //также статистику пересчитаю
+
+        await this.workStatistic(userId);
       }
 
       /*ТУТ ПРО ДОПОЛНИТЕЛЬНЫЙ БАЛЛ ДЛЯ ПЕРВОГО ОТВЕТИВШЕГО
@@ -653,8 +657,20 @@ export class GameService {
           /*также добавлю бал в таблицу Game*/
 
           await this.setScoreInTableGame(userId, idGame);
+
+          //также статистику пересчитаю
+
+          await this.workStatistic(userId);
         }
+
+        //также статистику пересчитаю
+
+        await this.workStatistic(userId);
       }
+
+      //также статистику пересчитаю
+
+      await this.workStatistic(userId);
     }
 
     ///////////////////////////////////////////////////////////
@@ -1030,7 +1046,7 @@ export class GameService {
       userId,
       allGamesWithCurrentUser,
     );
-    debugger;
+
     /*  в resStatistic будут данные вида
        {
           sumScore: 15,
