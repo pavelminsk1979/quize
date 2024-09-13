@@ -69,6 +69,7 @@ import { ValidUUIDGuard } from './common/guard/exist-game-guard';
 import { GameQueryRepository } from './feature/u-games/repositories/game-query-repository';
 import { Statistic } from './feature/u-games/domains/statistic.entity';
 import { StatisticRepository } from './feature/u-games/repositories/statistic-repository';
+import { StatisticQueryRepository } from './feature/u-games/repositories/statistic-query-repository';
 
 dotenv.config();
 
@@ -187,6 +188,7 @@ dotenv.config();
     ValidUUIDGuard,
     GameQueryRepository,
     StatisticRepository,
+    StatisticQueryRepository,
   ],
 })
 export class AppModule {}

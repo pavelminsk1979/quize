@@ -20,12 +20,14 @@ import { ValidUUIDGuard } from '../../../common/guard/exist-game-guard';
 import { QueryParamsGameInputModel } from '../../../common/pipes/query-params-game-input-model';
 import { GameQueryRepository } from '../repositories/game-query-repository';
 import { QueryParamStatisticInputModel } from '../../../common/pipes/query-param-statistic-input-model';
+import { StatisticQueryRepository } from '../repositories/statistic-query-repository';
 
 @Controller('pair-game-quiz')
 export class GameController {
   constructor(
     protected gameService: GameService,
     protected gameQueryRepository: GameQueryRepository,
+    protected statisticQueryRepository: StatisticQueryRepository,
   ) {}
 
   @UseGuards(AuthTokenGuard)
@@ -153,7 +155,7 @@ export class GameController {
     @Query() queryParamStatisticInputModel: QueryParamStatisticInputModel,
   ) {
     const statisticGamesWithPagination =
-      await this.gameService.getStatisticGamesWithPagination(
+      await this.statisticQueryRepository.getStatisticGamesWithPagination(
         queryParamStatisticInputModel,
       );
 
