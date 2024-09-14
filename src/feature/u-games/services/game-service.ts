@@ -1046,7 +1046,7 @@ export class GameService {
           drawsCount: 1
         } 
         ИХ ПОМЕЩАЮ В ТАБЛИЦУ Statistic*/
-    debugger;
+
     await this.statisticRepository.updateStatistic(resStatistic, userId);
 
     ///////////////////////////////////////////////////////////

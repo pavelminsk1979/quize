@@ -158,7 +158,7 @@ export class GameController {
       await this.statisticQueryRepository.getStatisticGamesWithPagination(
         queryParamStatisticInputModel,
       );
-    console.log(statisticGamesWithPagination);
+
     return statisticGamesWithPagination;
   }
 }

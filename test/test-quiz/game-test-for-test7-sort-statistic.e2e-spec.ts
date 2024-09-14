@@ -723,7 +723,7 @@ describe('tests for andpoint users', () => {
 
   it('get statistic my  games', async () => {
     const res = await request(app.getHttpServer())
-      .get('/pair-game-quiz/users/my-statistic')
+      .get('/pair-game-quiz/users/top?sort=avgScores desc')
       .set('Authorization', `Bearer ${accessToken1}`)
       .expect(200);
 

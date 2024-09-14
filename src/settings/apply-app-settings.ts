@@ -41,7 +41,10 @@ export const applyAppSettings = (app: INestApplication) => {
             });
           });
         });
+        console.log('error');
         console.log('@@@@@@@@@@@@@', errorForResponse);
+        console.log('error');
+
         throw new BadRequestException(errorForResponse);
       },
     }),
