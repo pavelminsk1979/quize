@@ -577,6 +577,8 @@ export class GameService {
    тогда игра завершена ЕСЛИ У ПАРЫ ТОЖЕ 5 ЗАПИСЕЙ 
    */
 
+    let pairIdUser: string = '';
+
     if (amountAnswers >= 5) {
       /*  надо найти  пару (две записи) для данной игры
         в таблице ConnectionTabl*/
@@ -593,7 +595,7 @@ export class GameService {
       /* оставлю одну айдишку- та которая партнера в 
        данной игре */
 
-      const pairIdUser = twoId.filter((el) => el !== userId)[0];
+      pairIdUser = twoId.filter((el) => el !== userId)[0];
 
       /* узнаю  количество записей
        в  таблице Answers  для ИГРОКА_ПАРЫ  */
@@ -662,6 +664,14 @@ export class GameService {
 
     await this.workStatistic(userId);
 
+    /* и каждый раз статистику пересчитываю и помещаю
+    данные в таблицу СТАТИСТИК также и для второго
+    игрока в паре */
+
+    if (pairIdUser.length !== 0) {
+      await this.workStatistic(pairIdUser);
+    }
+
     //на фронт возвращаю viewModel
 
     return {
@@ -686,7 +696,7 @@ export class GameService {
     if (!user) {
       throw new UnauthorizedException();
     }
-
+    //'correct', 'incor'
     /* есть ли в таблице ConnectionTabl  запись
   c пришедшей userId и  со
   статусом   status:active  --   тобишь этот пользователь
@@ -1036,7 +1046,7 @@ export class GameService {
           drawsCount: 1
         } 
         ИХ ПОМЕЩАЮ В ТАБЛИЦУ Statistic*/
-
+    debugger;
     await this.statisticRepository.updateStatistic(resStatistic, userId);
 
     ///////////////////////////////////////////////////////////
