@@ -14,6 +14,9 @@ export type CreateGame = {
   loginPlayer2: null;
   scorePlayer1: number;
   scorePlayer2: number;
+  xdate: null;
+  xplayer: null;
+  zplayer: null;
 };
 
 export type Connection = {

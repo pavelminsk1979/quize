@@ -20,6 +20,7 @@ describe('tests for andpoint users', () => {
   let accessToken1;
   let accessToken2;
   let accessToken3;
+  let accessToken4;
 
   const login2 = 'logi333';
   const password2 = 'passwor333';
@@ -28,6 +29,10 @@ describe('tests for andpoint users', () => {
   const login3 = 'login22';
   const password3 = 'passwor22';
   const email3 = 'avelminsk22@mail.ru';
+
+  const login4 = 'login4';
+  const password4 = 'passwor4';
+  const email4 = 'avelminsk4@mail.ru';
 
   const loginPasswordBasic64 = 'YWRtaW46cXdlcnR5';
 
@@ -136,6 +141,35 @@ describe('tests for andpoint users', () => {
       .expect(200);
 
     accessToken3 = res.body.accessToken;
+    //console.log(accessToken1);
+  });
+
+  it('create user4', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/sa/users')
+      .set('Authorization', `Basic ${loginPasswordBasic64}`)
+      .send({
+        login: login4,
+        password: password4,
+        email: email4,
+      })
+      .expect(201);
+
+    //userId = res.body.id;
+
+    //console.log(res.body);
+  });
+
+  it('login  user', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({
+        loginOrEmail: login4,
+        password: password4,
+      })
+      .expect(200);
+
+    accessToken4 = res.body.accessToken;
     //console.log(accessToken1);
   });
 
@@ -261,111 +295,110 @@ describe('tests for andpoint users', () => {
       .expect(204);
   });
 
-  /* it('start game1 first player', async () => {
-     const resultat = await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/connection')
-       .set('Authorization', `Bearer ${accessToken1}`)
-       .expect(200);
-     /!* console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&');
-      console.log(resultat.body);
-      console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&');*!/
-   });
- 
-   it('start game1 second player', async () => {
-     const resultat = await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/connection')
-       .set('Authorization', `Bearer ${accessToken2}`)
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken1}`)
-       .send({ answer: 'correctanswer' })
-       .expect(200);
-     //console.log(res.body);
-   });
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken1}`)
-       .send({ answer: 'correctanswer' })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken1}`)
-       .send({ answer: 'correctanswer' })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken1}`)
-       .send({ answer: 'correctanswer' })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken1}`)
-       .send({ answer: 'incorrectanswer' })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken2}`)
-       .send({ answer: 'correctanswer' })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken2}`)
-       .send({ answer: 'correctanswer' })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken2}`)
-       .send({ answer: 'incorrectanswer' })
-       .expect(200);
-     //console.log(res.body);
-   });
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken2}`)
-       .send({ answer: 'incorrectanswer' })
-       .expect(200);
-     //console.log(res.body);
-   });
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken2}`)
-       .send({ answer: 'incorrectanswer' })
-       .expect(200);
-     //console.log(res.body);
-   });
- */
+  it('start game1 first player', async () => {
+    const resultat = await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/connection')
+      .set('Authorization', `Bearer ${accessToken1}`)
+      .expect(200);
+    /* console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+     console.log(resultat.body);
+     console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&');*/
+  });
+
+  it('start game1 second player', async () => {
+    const resultat = await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/connection')
+      .set('Authorization', `Bearer ${accessToken2}`)
+      .expect(200);
+    //console.log(res.body);
+  });
+
+  it('set answer', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken1}`)
+      .send({ answer: 'correctanswer' })
+      .expect(200);
+    //console.log(res.body);
+  });
+  it('set answer', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken1}`)
+      .send({ answer: 'correctanswer' })
+      .expect(200);
+    //console.log(res.body);
+  });
+
+  it('set answer', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken1}`)
+      .send({ answer: 'correctanswer' })
+      .expect(200);
+    //console.log(res.body);
+  });
+
+  it('set answer', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken1}`)
+      .send({ answer: 'correctanswer' })
+      .expect(200);
+    //console.log(res.body);
+  });
+
+  it('set answer', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken1}`)
+      .send({ answer: 'incorrectanswer' })
+      .expect(200);
+    //console.log(res.body);
+  });
+
+  it('set answer', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken2}`)
+      .send({ answer: 'correctanswer' })
+      .expect(200);
+    //console.log(res.body);
+  });
+
+  it('set answer', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken2}`)
+      .send({ answer: 'correctanswer' })
+      .expect(200);
+    //console.log(res.body);
+  });
+
+  it('set answer', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken2}`)
+      .send({ answer: 'incorrectanswer' })
+      .expect(200);
+    //console.log(res.body);
+  });
+  it('set answer', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken2}`)
+      .send({ answer: 'incorrectanswer' })
+      .expect(200);
+    //console.log(res.body);
+  });
+  it('set answer', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken2}`)
+      .send({ answer: 'incorrectanswer' })
+      .expect(200);
+    //console.log(res.body);
+  });
   ////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////
@@ -403,7 +436,7 @@ describe('tests for andpoint users', () => {
     await request(app.getHttpServer())
       .post('/pair-game-quiz/pairs/my-current/answers')
       .set('Authorization', `Bearer ${accessToken1}`)
-      .send({ answer: 'incorrectanswer' })
+      .send({ answer: 'correctanswer' })
       .expect(200);
     //console.log(res.body);
   });
@@ -412,7 +445,7 @@ describe('tests for andpoint users', () => {
     await request(app.getHttpServer())
       .post('/pair-game-quiz/pairs/my-current/answers')
       .set('Authorization', `Bearer ${accessToken1}`)
-      .send({ answer: 'incorrectanswer' })
+      .send({ answer: 'correctanswer' })
       .expect(200);
     //console.log(res.body);
   });
@@ -446,6 +479,40 @@ describe('tests for andpoint users', () => {
     await request(app.getHttpServer())
       .post('/pair-game-quiz/pairs/my-current/answers')
       .set('Authorization', `Bearer ${accessToken2}`)
+      .send({ answer: 'incorrectanswer' })
+      .expect(200);
+    //console.log(res.body);
+  });
+
+  /////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////
+  //'my-current/answers'
+  ///////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////
+
+  it('start game3 first player', async () => {
+    const resultat = await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/connection')
+      .set('Authorization', `Bearer ${accessToken3}`)
+      .expect(200);
+    /*  console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&');
+      console.log(resultat.body);
+      console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&');*/
+  });
+
+  it('start game3 second player', async () => {
+    const resultat = await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/connection')
+      .set('Authorization', `Bearer ${accessToken4}`)
+      .expect(200);
+    //console.log(res.body);
+  });
+
+  it('set answer', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken4}`)
       .send({ answer: 'correctanswer' })
       .expect(200);
     //console.log(res.body);
@@ -454,8 +521,8 @@ describe('tests for andpoint users', () => {
   it('set answer', async () => {
     await request(app.getHttpServer())
       .post('/pair-game-quiz/pairs/my-current/answers')
-      .set('Authorization', `Bearer ${accessToken2}`)
-      .send({ answer: 'incorrectanswer' })
+      .set('Authorization', `Bearer ${accessToken3}`)
+      .send({ answer: 'correctanswer' })
       .expect(200);
     //console.log(res.body);
   });
@@ -463,8 +530,8 @@ describe('tests for andpoint users', () => {
   it('set answer', async () => {
     await request(app.getHttpServer())
       .post('/pair-game-quiz/pairs/my-current/answers')
-      .set('Authorization', `Bearer ${accessToken2}`)
-      .send({ answer: 'incorrectanswer' })
+      .set('Authorization', `Bearer ${accessToken3}`)
+      .send({ answer: 'correctanswer' })
       .expect(200);
     //console.log(res.body);
   });
@@ -472,248 +539,29 @@ describe('tests for andpoint users', () => {
   it('set answer', async () => {
     await request(app.getHttpServer())
       .post('/pair-game-quiz/pairs/my-current/answers')
-      .set('Authorization', `Bearer ${accessToken2}`)
-      .send({ answer: 'incorrectanswer' })
+      .set('Authorization', `Bearer ${accessToken3}`)
+      .send({ answer: 'correctanswer' })
       .expect(200);
     //console.log(res.body);
   });
 
-  /////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////
-  //'my-current/answers'
-  ///////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////
+  it('set answer', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken3}`)
+      .send({ answer: 'correctanswer' })
+      .expect(200);
+    //console.log(res.body);
+  });
 
-  /* it('start game3 first player', async () => {
-     const resultat = await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/connection')
-       .set('Authorization', `Bearer ${accessToken3}`)
-       .expect(200);
-     /!* console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&');
-      console.log(resultat.body);
-      console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&');*!/
-   });
- 
-   it('start game3 second player', async () => {
-     const resultat = await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/connection')
-       .set('Authorization', `Bearer ${accessToken2}`)
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   /////////////////////////////////////////////////////////////
-   ////////////////////////////////////////////////////////////
-   ////////////////////////////////////////////////////////////
-   //'my-current/answers'
-   ///////////////////////////////////////////////////////////
-   //////////////////////////////////////////////////////
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken2}`)
-       .send({ answer: answer33331 })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken2}`)
-       .send({ answer: answer33332 })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken2}`)
-       .send({ answer: answer33333 })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken2}`)
-       .send({ answer: answer33334 })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken2}`)
-       .send({ answer: answer33335 })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken3}`)
-       .send({ answer: answer31 })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken3}`)
-       .send({ answer: '777' })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken3}`)
-       .send({ answer: '8888' })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken3}`)
-       .send({ answer: answer34 })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken3}`)
-       .send({ answer: answer35 })
-       .expect(200);
-     //console.log(res.body);
-   });
- */
-  /////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////
-  //'my-current/answers'
-  ///////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////
-
-  /* it('start game4 first player', async () => {
-     const resultat = await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/connection')
-       .set('Authorization', `Bearer ${accessToken1}`)
-       .expect(200);
-     /!* console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&');
-      console.log(resultat.body);
-      console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&');*!/
-   });
- 
-   it('start game4 second player', async () => {
-     const resultat = await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/connection')
-       .set('Authorization', `Bearer ${accessToken3}`)
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken3}`)
-       .send({ answer: answer44441 })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken1}`)
-       .send({ answer: answer41 })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken3}`)
-       .send({ answer: answer44442 })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken1}`)
-       .send({ answer: answer42 })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken3}`)
-       .send({ answer: answer44443 })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken1}`)
-       .send({ answer: answer43 })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken3}`)
-       .send({ answer: 'ytyt' })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken1}`)
-       .send({ answer: 'ythghg' })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken3}`)
-       .send({ answer: 'hgjhg' })
-       .expect(200);
-     //console.log(res.body);
-   });
- 
-   it('set answer', async () => {
-     await request(app.getHttpServer())
-       .post('/pair-game-quiz/pairs/my-current/answers')
-       .set('Authorization', `Bearer ${accessToken1}`)
-       .send({ answer: 'jhfyf' })
-       .expect(200);
-     //console.log(res.body);
-   });*/
+  it('set answer', async () => {
+    await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .set('Authorization', `Bearer ${accessToken3}`)
+      .send({ answer: 'correctanswer' })
+      .expect(200);
+    //console.log(res.body);
+  });
   /////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////
@@ -727,6 +575,6 @@ describe('tests for andpoint users', () => {
       .set('Authorization', `Bearer ${accessToken1}`)
       .expect(200);
 
-    console.log(res.body);
+    //console.log(res.body);
   });
 });

@@ -33,6 +33,15 @@ export class Game {
   @Column({ type: 'text', nullable: true })
   public loginPlayer2: string | null;
 
+  @Column({ type: 'text', nullable: true })
+  public xdate: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  public xplayer: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  public zplayer: string | null;
+
   @Column()
   public scorePlayer1: number;
 

@@ -27,6 +27,8 @@ import { AnswerRepository } from '../repositories/answer-repository';
 import { Game } from '../domains/game.entity';
 import { Usertyp } from '../../users/domains/usertyp.entity';
 import { StatisticRepository } from '../repositories/statistic-repository';
+import { Cron } from '@nestjs/schedule';
+import { Answers } from '../domains/answers.entity';
 
 @Injectable()
 export class GameService {
@@ -654,6 +656,21 @@ export class GameService {
       }
     }
 
+    /* если  5 ответов у юзера 
+  --  В ДАННОМ БЛОКЕ ПРОПИСАН КОД 
+ ДЛЯ части  ЛОГИКИ -- КОГДА ИГРУ ОДИН ЗАВЕРШИЛ ТО 
+ ВТОРОЙ ДОЛЖЕН АВТОМАТОМ ЗАВЕРШИТЬ ЧЕРЕЗ 10 сек */
+
+    if (amountAnswers >= 5) {
+      /*в таблицу Game помещу дату завершения 
+      игры xdate  +  адишку игрока завершившего 
+      игру - xplayer  +  адишку игрока 
+       у которого 10 секунд есть чтоб завершить 
+       игру zplayer*/
+
+      await this.gameRepository.setXDate(idGame, addedAt, userId, pairIdUser);
+    }
+
     ///////////////////////////////////////////////////////////
     /* и также если игрок дал любой ответ
     буду работать с таблицей Statistic
@@ -734,6 +751,9 @@ export class GameService {
         loginPlayer2: null,
         scorePlayer1: 0,
         scorePlayer2: 0,
+        xdate: null,
+        xplayer: null,
+        zplayer: null,
       };
       const gameId: string = await this.gameRepository.createGame(newGame);
 
@@ -1051,4 +1071,119 @@ export class GameService {
 
     ///////////////////////////////////////////////////////////
   }
+
+  /* этот метод-handleCron  отрабатывает каждую секунду 
+   когда приложение запущено */
+
+  //@Cron('0 * * * * *')
+  @Cron(' * * * * * *')
+  async handleCron() {
+    /*получу все игры у которых статус Active
+      и плюс присутствует xdate...
+      ---xdate  или null  или если
+      плэйер ответил на 5 вопросов тогда стоит дата */
+
+    const getGames =
+      await this.gameRepository.getAllGamesWithStatusActiveAndXDate();
+
+    const getGameFinish: Game[] = [];
+
+    for (let i = 0; i < getGames.length; i++) {
+      const rowGame = getGames[i];
+
+      /*текущая дата */
+
+      const currentDate = new Date().toISOString();
+
+      /*к дате xdate  добавлю 9 секунд
+      ----в поле xdate может быть значение null, а конструктор Date не принимает null в качестве аргумента*/
+
+      const date = rowGame.xdate ? new Date(rowGame.xdate) : null;
+
+      if (!date) continue;
+
+      date.setTime(date.getTime() + 9000);
+
+      const datePlusNineSecond = date.toISOString();
+
+      if (currentDate > datePlusNineSecond) {
+        getGameFinish.push(getGames[i]);
+      }
+    }
+
+    /* getGameFinish - всем  zplayer + xplayer поставить надо
+    статус ФИНИШ в таблице Game
+    ---- и плюс поставить статус ФИНИШ
+     в  таблице  ConnectionTabl */
+
+    for (let i = 0; i < getGameFinish.length; i++) {
+      const item = getGameFinish[i];
+
+      if (!item.zplayer) continue;
+
+      if (!item.xplayer) continue;
+
+      if (!item.xdate) continue;
+
+      //status: GameStatus.FINISHED--- в таблицу ConnectionTabl
+
+      await this.connectionRepository.changeActiveToFinished(
+        String(item.idGame),
+      );
+
+      /*---это в таблицу  Game,  колонка finishGameDate*/
+
+      await this.gameRepository.setDateFinished(
+        String(item.idGame),
+        item.xdate,
+      );
+
+      //status: GameStatus.FINISHED--- в таблицу Game
+
+      await this.gameRepository.setStatusFinished(String(item.idGame));
+
+      //статистику пересчитать для обоих игроков
+
+      await this.workStatistic(item.xplayer);
+
+      await this.workStatistic(item.zplayer);
+    }
+  }
 }
+
+/*[
+  Game {
+  idGame: 5,
+  createdAt: "2024-09-16T11:44:48.023Z",
+  status: "Active",
+  pairCreatedDate: "2024-09-16T11:44:48.023Z",
+  startGameDate: "2024-09-16T11:44:48.057Z",
+  finishGameDate: null,
+  idPlayer2: "b63a1988-d202-4939-9fd5-b3ad29125cae",
+  loginPlayer2: "login400",
+  xdate: "2024-09-16T11:44:48.165Z",
+  xplayer: "b63a1988-d202-4939-9fd5-b3ad29125cae",
+  zplayer: "2ae46688-b6d0-40e4-898d-ae05cd62d0eb",
+  scorePlayer1: 1,
+  scorePlayer2: 4,
+  idPlayer1: "2ae46688-b6d0-40e4-898d-ae05cd62d0eb",
+  loginPlayer1: "logi333"
+},
+  Game {
+  idGame: 6,
+  createdAt: "2024-09-16T11:44:48.246Z",
+  status: "Active",
+  pairCreatedDate: "2024-09-16T11:44:48.246Z",
+  startGameDate: "2024-09-16T11:44:48.277Z",
+  finishGameDate: null,
+  idPlayer2: "838bf238-b800-4a29-bf56-d66b0072e4da",
+  loginPlayer2: "login4",
+  xdate: "2024-09-16T11:44:48.419Z",
+  xplayer: "b0e0d1e1-2308-4641-8727-c1539fbc0818",
+  zplayer: "838bf238-b800-4a29-bf56-d66b0072e4da",
+  scorePlayer1: 6,
+  scorePlayer2: 1,
+  idPlayer1: "b0e0d1e1-2308-4641-8727-c1539fbc0818",
+  loginPlayer1: "login22"
+}
+];*/

@@ -70,11 +70,13 @@ import { GameQueryRepository } from './feature/u-games/repositories/game-query-r
 import { Statistic } from './feature/u-games/domains/statistic.entity';
 import { StatisticRepository } from './feature/u-games/repositories/statistic-repository';
 import { StatisticQueryRepository } from './feature/u-games/repositories/statistic-query-repository';
+import { ScheduleModule } from '@nestjs/schedule';
 
 dotenv.config();
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     CqrsModule,
     ConfigModule.forRoot({
       isGlobal: true,
